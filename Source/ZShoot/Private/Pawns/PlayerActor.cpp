@@ -1,0 +1,139 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Pawns/PlayerActor.h"
+#include "Components/BoxComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "MathUtil.h"
+#include "Components/InputComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/LocalPlayer.h"
+#include "Engine/Engine.h"
+
+// Sets default values
+APlayerActor::APlayerActor()
+{
+ 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
+	RootComponent = BoxComp;
+
+	WheelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel Mesh"));
+	WheelMesh->SetupAttachment(BoxComp);
+	
+	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
+	BodyMesh->SetupAttachment(BoxComp);
+
+	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
+	TurretMesh->SetupAttachment(BodyMesh);
+
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
+	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
+	
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
+	SpringArmComp->SetupAttachment(BoxComp);
+
+	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComp->SetupAttachment(SpringArmComp);
+
+}
+
+// Called when the game starts or when spawned
+void APlayerActor::BeginPlay()
+{
+	Super::BeginPlay();
+
+	PlayerController = Cast<APlayerController>(GetController());
+
+	if (PlayerController)
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(PlayerContext, 0);
+		}
+	}
+	
+}
+
+// Called every frame
+void APlayerActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+}
+
+// Called to bind functionality to input
+void APlayerActor::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		if (MovementAction)
+		{
+			EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &APlayerActor::Move);
+		}
+		if (LookAction)
+		{
+			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerActor::LookAround);
+		}
+	}
+}
+
+void APlayerActor::Move(const FInputActionValue& Value)
+{
+	const FVector2D MovementVector = Value.Get<FVector2D>();
+
+	if (Controller)
+	{
+		// Global Movement
+		FRotator SpringArmRotation = SpringArmComp->GetRelativeRotation();
+		SpringArmRotation.Pitch = 0.f;
+		FVector SpringArmForwardDirection = FRotationMatrix(SpringArmRotation).GetUnitAxis(EAxis::X);
+		FVector SpringArmRightDirection = FRotationMatrix(SpringArmRotation).GetUnitAxis(EAxis::Y);
+
+		FVector DeltaLocation = FVector::ZeroVector;
+		DeltaLocation += SpringArmForwardDirection * MovementVector.Y * Speed * UGameplayStatics::GetWorldDeltaSeconds(this);
+		DeltaLocation += SpringArmRightDirection * MovementVector.X * Speed * UGameplayStatics::GetWorldDeltaSeconds(this);
+		DeltaLocation.Z = 0.f;
+		AddActorLocalOffset(DeltaLocation, true);
+
+		// Wheel Movement, fake movement
+		FVector RotationAxis = FVector::CrossProduct(FVector::UpVector, DeltaLocation.GetSafeNormal());
+
+		float Distance = DeltaLocation.Size();
+		float SphereRadius = WheelMesh->GetComponentScale().X * 50.f;
+		float RollAngle = FMath::RadiansToDegrees(Distance / SphereRadius);
+
+		FQuat RotationDelta = FQuat(RotationAxis, FMath::DegreesToRadians(RollAngle));
+		WheelMesh->AddLocalRotation(RotationDelta);
+
+	}
+}
+
+void APlayerActor::LookAround(const FInputActionValue& Value)
+{
+	const FVector2D RotationVector = Value.Get<FVector2D>();
+	
+	if (Controller)
+	{
+		// Turret Rotation
+		FRotator TurretDeltaRotation = FRotator::ZeroRotator;
+		FRotator TurretRotator = TurretMesh->GetRelativeRotation();
+		TurretDeltaRotation.Yaw = TurretRotator.Yaw + RotationVector.X * CamSens * UGameplayStatics::GetWorldDeltaSeconds(this);
+		TurretMesh->SetWorldRotation(TurretDeltaRotation, false);
+
+		// Spring Arm Rotation -> Camera Rotation
+		FRotator SpringArmDeltaRotation = FRotator::ZeroRotator;
+		FRotator SpringArmRotator = SpringArmComp->GetRelativeRotation();
+		SpringArmDeltaRotation.Yaw = SpringArmRotator.Yaw + RotationVector.X * CamSens * UGameplayStatics::GetWorldDeltaSeconds(this);
+		SpringArmDeltaRotation.Pitch = SpringArmRotator.Pitch + RotationVector.Y * CamSens * UGameplayStatics::GetWorldDeltaSeconds(this);
+		SpringArmDeltaRotation.Pitch = FMathf::Clamp(SpringArmDeltaRotation.Pitch, -89.9f, 89.9f);
+		SpringArmComp->SetWorldRotation(SpringArmDeltaRotation, false);
+	}
+}
+

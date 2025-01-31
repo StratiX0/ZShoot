@@ -1,0 +1,81 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Pawn.h"
+#include "InputActionValue.h"
+#include "PlayerActor.generated.h"
+
+class UBoxComponent;
+class UCameraComponent;
+class USpringArmComponent;
+class UInputMappingContext;
+class UInputAction;
+/**
+ * 
+ */
+UCLASS()
+class ZSHOOT_API APlayerActor : public APawn
+{
+	GENERATED_BODY()
+
+public:
+	APlayerActor();
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Tick(float DeltaTime) override;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category= "Input")
+	UInputMappingContext* PlayerContext;
+
+	UPROPERTY(EditAnywhere, Category= "Input")
+	UInputAction* MovementAction;
+	
+	UPROPERTY(EditAnywhere, Category= "Input")
+	UInputAction* LookAction;
+	
+	UPROPERTY(EditAnywhere, Category= "Input")
+	UInputAction* FireAction;
+
+	void Move(const FInputActionValue& Value);
+	void LookAround(const FInputActionValue& Value);
+
+private:	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UBoxComponent* BoxComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* WheelMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* BodyMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* TurretMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* ProjectileSpawnPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* CameraComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float Speed = 400.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float CamSens = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float InterpSpeed = 2.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	APlayerController* PlayerController;
+	
+};
