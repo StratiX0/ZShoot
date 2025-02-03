@@ -12,6 +12,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UInputMappingContext;
 class UInputAction;
+class UNiagaraSystem;
 /**
  * 
  */
@@ -49,6 +50,7 @@ protected:
 	
 	void SwitchCameraSide(const FInputActionValue& Value);
 	void AllowCameraSwitch() { CanSwitchCameraSide = true; }
+	void AllowShoot() { CanShoot = true; }
 
 	void Fire(const FInputActionValue& Value);
 	FHitResult FireRaycast();
@@ -69,7 +71,7 @@ private:
 	UStaticMeshComponent* TurretMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	USceneComponent* ProjectileSpawnPoint;
+	USceneComponent* ShootingPoint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComp;
@@ -102,11 +104,18 @@ private:
 	FTimerHandle CameraSwitchTimerHandler;
 
 	// Shooting Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shoot", meta = (AllowPrivateAccess = "true"))
 	float Damage = 10.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shoot", meta = (AllowPrivateAccess = "true"))
 	float FireRate = 500.f;
-	
+
+	bool CanShoot = true;
+	FTimerHandle ShootTimerHandler;
+
+
+	// VFX Properties
+	UPROPERTY(EditAnywhere, Category="Shoot")
+	UNiagaraSystem* ShootingVFX;
 	
 };

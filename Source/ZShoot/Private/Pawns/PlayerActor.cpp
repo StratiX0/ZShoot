@@ -13,6 +13,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/Engine.h"
 #include "Components/HealthComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 APlayerActor::APlayerActor()
@@ -32,8 +33,8 @@ APlayerActor::APlayerActor()
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
 	TurretMesh->SetupAttachment(BodyMesh);
 
-	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
-	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
+	ShootingPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
+	ShootingPoint->SetupAttachment(TurretMesh);
 	
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArmComp->SetupAttachment(BoxComp);
@@ -158,12 +159,19 @@ void APlayerActor::SwitchCameraSide(const FInputActionValue& Value)
 
 	CanSwitchCameraSide = false;
 	CameraSwitchTimerHandler.Invalidate();
-	GetWorldTimerManager().SetTimer(CameraSwitchTimerHandler, this, &APlayerActor::AllowCameraSwitch, 2, false);
+	GetWorldTimerManager().SetTimer(CameraSwitchTimerHandler, this, &APlayerActor::AllowCameraSwitch, CameraSwitchTime, false);
 }
 
 void APlayerActor::Fire(const FInputActionValue& Value)
 {
+	if (!CanShoot) return;
+	
 	FHitResult OutHit = FireRaycast();
+
+	if (ShootingVFX)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ShootingVFX, ShootingPoint->GetComponentLocation(), ShootingPoint->GetComponentRotation());
+	}
 	
 	if (OutHit.GetActor())
 	{
@@ -171,6 +179,12 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 		UGameplayStatics::ApplyDamage(OutHit.GetActor(), Damage, GetInstigatorController(), this, DamageTypeClass);
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OutHit.GetActor()->GetName());
 	}
+
+	float Interval = 60.f / FireRate;
+
+	ShootTimerHandler.Invalidate();
+	GetWorldTimerManager().SetTimer(ShootTimerHandler, this, &APlayerActor::AllowShoot, Interval, false);
+	CanShoot = false;
 }
 
 FHitResult APlayerActor::FireRaycast()
@@ -178,7 +192,7 @@ FHitResult APlayerActor::FireRaycast()
 	FRotator CameraRotation = CameraComp->GetComponentRotation();
 	FVector RotXVector = CameraRotation.Vector();
 
-	FVector Start = ProjectileSpawnPoint->GetComponentLocation();
+	FVector Start = ShootingPoint->GetComponentLocation();
 
 	int32 distance = 2000;
 	FVector End = (RotXVector * distance) + Start;
