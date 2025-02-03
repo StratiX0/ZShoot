@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/Engine.h"
+#include "Components/HealthComponent.h"
 
 // Sets default values
 APlayerActor::APlayerActor()
@@ -162,30 +163,35 @@ void APlayerActor::SwitchCameraSide(const FInputActionValue& Value)
 
 void APlayerActor::Fire(const FInputActionValue& Value)
 {
-	// Storing the Location and Rotation of the Character
+	FHitResult OutHit = FireRaycast();
+	
+	if (OutHit.GetActor())
+	{
+		auto DamageTypeClass = UDamageType::StaticClass();		
+		UGameplayStatics::ApplyDamage(OutHit.GetActor(), Damage, GetInstigatorController(), this, DamageTypeClass);
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OutHit.GetActor()->GetName());
+	}
+}
+
+FHitResult APlayerActor::FireRaycast()
+{
 	FRotator CameraRotation = CameraComp->GetComponentRotation();
 	FVector RotXVector = CameraRotation.Vector();
 
-	// START PLUG
-	FVector StartPlug = ProjectileSpawnPoint->GetComponentLocation();
+	FVector Start = ProjectileSpawnPoint->GetComponentLocation();
 
-	// END PLUG 	
-	int32 distance = 2000; // Maximum distance of the trace
-	FVector EndPlug = (RotXVector * distance) + StartPlug;
+	int32 distance = 2000;
+	FVector End = (RotXVector * distance) + Start;
 
-	// Draws the red debug line
-	DrawDebugLine(GetWorld(), StartPlug, EndPlug, FColor(255, 0, 0), true, 5, 0, 0.7f);
+	DrawDebugLine(GetWorld(), Start, End, FColor(255, 0, 0), true, 5, 0, 0.7f);
 
 	FHitResult OutHit;
 	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
 	RV_TraceParams.bTraceComplex = true;
 	RV_TraceParams.bReturnPhysicalMaterial = false;
 	
-	GetWorld()->LineTraceSingleByChannel(OutHit, StartPlug, EndPlug, ECC_Visibility, RV_TraceParams);
-	
-	if (OutHit.GetActor())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OutHit.GetActor()->GetName());
-	}
+	GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, RV_TraceParams);
+
+	return OutHit;
 }
 

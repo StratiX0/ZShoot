@@ -51,6 +51,7 @@ protected:
 	void AllowCameraSwitch() { CanSwitchCameraSide = true; }
 
 	void Fire(const FInputActionValue& Value);
+	FHitResult FireRaycast();
 
 private:
 

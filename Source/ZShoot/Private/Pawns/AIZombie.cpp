@@ -3,6 +3,7 @@
 
 #include "Pawns/AIZombie.h"
 #include "Components/BoxComponent.h"
+#include "Components/HealthComponent.h"
 
 // Sets default values
 AAIZombie::AAIZombie()
@@ -15,6 +16,8 @@ AAIZombie::AAIZombie()
 	
 	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
 	BodyMesh->SetupAttachment(BoxComp);
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
 // Called when the game starts or when spawned

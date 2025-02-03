@@ -7,6 +7,7 @@
 #include "AIZombie.generated.h"
 
 class UBoxComponent;
+class UHealthComponent;
 
 UCLASS()
 class ZSHOOT_API AAIZombie : public APawn
@@ -28,5 +29,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BodyMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent;
 
 };
