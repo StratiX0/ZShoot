@@ -85,6 +85,10 @@ void APlayerActor::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		{
 			EnhancedInputComponent->BindAction(SwitchCameraSideAction, ETriggerEvent::Triggered, this, &APlayerActor::SwitchCameraSide);
 		}
+		if (FireAction)
+		{
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &APlayerActor::Fire);
+		}
 	}
 }
 
@@ -154,5 +158,34 @@ void APlayerActor::SwitchCameraSide(const FInputActionValue& Value)
 	CanSwitchCameraSide = false;
 	CameraSwitchTimerHandler.Invalidate();
 	GetWorldTimerManager().SetTimer(CameraSwitchTimerHandler, this, &APlayerActor::AllowCameraSwitch, 2, false);
+}
+
+void APlayerActor::Fire(const FInputActionValue& Value)
+{
+	// Storing the Location and Rotation of the Character
+	FRotator CameraRotation = CameraComp->GetComponentRotation();
+	FVector RotXVector = CameraRotation.Vector();
+
+	// START PLUG
+	FVector StartPlug = ProjectileSpawnPoint->GetComponentLocation();
+
+	// END PLUG 	
+	int32 distance = 2000; // Maximum distance of the trace
+	FVector EndPlug = (RotXVector * distance) + StartPlug;
+
+	// Draws the red debug line
+	DrawDebugLine(GetWorld(), StartPlug, EndPlug, FColor(255, 0, 0), true, 5, 0, 0.7f);
+
+	FHitResult OutHit;
+	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+	RV_TraceParams.bTraceComplex = true;
+	RV_TraceParams.bReturnPhysicalMaterial = false;
+	
+	GetWorld()->LineTraceSingleByChannel(OutHit, StartPlug, EndPlug, ECC_Visibility, RV_TraceParams);
+	
+	if (OutHit.GetActor())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OutHit.GetActor()->GetName());
+	}
 }
 

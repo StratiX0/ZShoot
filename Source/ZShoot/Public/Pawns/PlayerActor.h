@@ -46,10 +46,15 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void LookAround(const FInputActionValue& Value);
+	
 	void SwitchCameraSide(const FInputActionValue& Value);
 	void AllowCameraSwitch() { CanSwitchCameraSide = true; }
 
-private:	
+	void Fire(const FInputActionValue& Value);
+
+private:
+
+	// Model Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxComp;
 
@@ -71,6 +76,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComp;
 
+	// Movement Properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float Speed = 400.f;
 
@@ -80,6 +86,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	APlayerController* PlayerController;
 
+	// Camera Properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	float CamSens = 1.f;
 
@@ -92,5 +99,13 @@ private:
 	bool CanSwitchCameraSide = true;
 	bool CameraIsOnRightSide = true;
 	FTimerHandle CameraSwitchTimerHandler;
+
+	// Shooting Properties
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	float Damage = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	float FireRate = 500.f;
+	
 	
 };
