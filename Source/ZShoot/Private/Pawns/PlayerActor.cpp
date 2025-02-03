@@ -81,6 +81,10 @@ void APlayerActor::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		{
 			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerActor::LookAround);
 		}
+		if (SwitchCameraSideAction)
+		{
+			EnhancedInputComponent->BindAction(SwitchCameraSideAction, ETriggerEvent::Triggered, this, &APlayerActor::SwitchCameraSide);
+		}
 	}
 }
 
@@ -135,5 +139,20 @@ void APlayerActor::LookAround(const FInputActionValue& Value)
 		SpringArmDeltaRotation.Pitch = FMathf::Clamp(SpringArmDeltaRotation.Pitch, -89.9f, 89.9f);
 		SpringArmComp->SetWorldRotation(SpringArmDeltaRotation, false);
 	}
+}
+
+void APlayerActor::SwitchCameraSide(const FInputActionValue& Value)
+{
+	if (!CanSwitchCameraSide) return;
+
+	CameraIsOnRightSide = !CameraIsOnRightSide;
+	
+	CameraIsOnRightSide ? CameraOffsetY = 100.f : CameraOffsetY = -100.f;
+
+	SpringArmComp->SocketOffset = FVector(0.f, CameraOffsetY, SpringArmComp->SocketOffset.Z);
+
+	CanSwitchCameraSide = false;
+	CameraSwitchTimerHandler.Invalidate();
+	GetWorldTimerManager().SetTimer(CameraSwitchTimerHandler, this, &APlayerActor::AllowCameraSwitch, 2, false);
 }
 

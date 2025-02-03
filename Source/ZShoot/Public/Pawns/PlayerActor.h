@@ -37,12 +37,17 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category= "Input")
 	UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, Category= "Input")
+	UInputAction* SwitchCameraSideAction;
 	
 	UPROPERTY(EditAnywhere, Category= "Input")
 	UInputAction* FireAction;
 
 	void Move(const FInputActionValue& Value);
 	void LookAround(const FInputActionValue& Value);
+	void SwitchCameraSide(const FInputActionValue& Value);
+	void AllowCameraSwitch() { CanSwitchCameraSide = true; }
 
 private:	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
@@ -70,12 +75,22 @@ private:
 	float Speed = 400.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float CamSens = 1.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float InterpSpeed = 2.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	APlayerController* PlayerController;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	float CamSens = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	float CameraOffsetY = 100.f;
+	
+	UPROPERTY(EditAnywhere, Category="Camera")
+	float CameraSwitchTime = 1.f;
+	
+	bool CanSwitchCameraSide = true;
+	bool CameraIsOnRightSide = true;
+	FTimerHandle CameraSwitchTimerHandler;
 	
 };
