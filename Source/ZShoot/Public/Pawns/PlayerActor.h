@@ -13,6 +13,7 @@ class USpringArmComponent;
 class UInputMappingContext;
 class UInputAction;
 class UNiagaraSystem;
+class USoundCue;
 /**
  * 
  */
@@ -80,20 +81,20 @@ private:
 	UCameraComponent* CameraComp;
 
 	// Movement Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
 	float Speed = 400.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
 	float InterpSpeed = 2.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
 	APlayerController* PlayerController;
 
 	// Camera Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Properties Properties", meta = (AllowPrivateAccess = "true"))
 	float CamSens = 1.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Properties", meta = (AllowPrivateAccess = "true"))
 	float CameraOffsetY = 100.f;
 	
 	UPROPERTY(EditAnywhere, Category="Camera")
@@ -104,18 +105,21 @@ private:
 	FTimerHandle CameraSwitchTimerHandler;
 
 	// Shooting Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shoot", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
 	float Damage = 10.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shoot", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
 	float FireRate = 500.f;
 
 	bool CanShoot = true;
 	FTimerHandle ShootTimerHandler;
 
+	UPROPERTY(EditAnywhere, Category = "Combat Properties")
+	USoundCue* FireSFX;
+
 
 	// VFX Properties
-	UPROPERTY(EditAnywhere, Category="Shoot")
+	UPROPERTY(EditAnywhere, Category="Shoot Properties")
 	UNiagaraSystem* ShootingVFX;
 	
 };
