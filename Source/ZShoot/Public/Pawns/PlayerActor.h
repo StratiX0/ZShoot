@@ -14,6 +14,7 @@ class UInputMappingContext;
 class UInputAction;
 class UNiagaraSystem;
 class USoundCue;
+class UHealthComponent;
 /**
  * 
  */
@@ -79,6 +80,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent;
 
 	// Movement Properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))

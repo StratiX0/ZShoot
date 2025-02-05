@@ -10,8 +10,6 @@
 #include "MathUtil.h"
 #include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Engine/LocalPlayer.h"
-#include "Engine/Engine.h"
 #include "Components/HealthComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Sound/SoundCue.h"
@@ -42,6 +40,8 @@ APlayerActor::APlayerActor()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
 }
 
