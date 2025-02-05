@@ -16,6 +16,8 @@ public:
 	UHealthComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void Heal(float HealAmount);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

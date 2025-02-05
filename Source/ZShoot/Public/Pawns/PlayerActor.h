@@ -33,6 +33,10 @@ public:
 	UPROPERTY(EditAnywhere, Category="HUD Properties")
 	UPlayerHUDWidget* PlayerHUD;
 
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -86,9 +90,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UHealthComponent* HealthComponent;
-
 	// Movement Properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
 	float Speed = 400.f;
@@ -100,7 +101,7 @@ private:
 	APlayerController* PlayerController;
 
 	// Camera Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Properties Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Properties", meta = (AllowPrivateAccess = "true"))
 	float CamSens = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Properties", meta = (AllowPrivateAccess = "true"))

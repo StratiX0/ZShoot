@@ -19,7 +19,6 @@ void UHealthComponent::BeginPlay()
 
 	CurrentHealth = MaxHealth;
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
-	
 }
 
 // Called every frame
@@ -27,6 +26,19 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+}
+
+void UHealthComponent::Heal(float HealAmount)
+{
+	if (HealAmount <= 0.f) return;
+
+	CurrentHealth = FMath::Clamp(CurrentHealth + HealAmount, 0.f, MaxHealth);
+	
+	APlayerActor* PlayerActor = Cast<APlayerActor>(GetOwner());
+	if (PlayerActor)
+	{
+		PlayerActor->PlayerHUD->SetHealthValue(CurrentHealth / MaxHealth);
+	}
 }
 
 void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* Instigator, AActor* DamageCauser)
