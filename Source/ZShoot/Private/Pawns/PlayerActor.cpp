@@ -178,6 +178,10 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 		auto DamageTypeClass = UDamageType::StaticClass();		
 		UGameplayStatics::ApplyDamage(OutHit.GetActor(), Damage, GetInstigatorController(), this, DamageTypeClass);
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OutHit.GetActor()->GetName());
+		// if (OutHit.GetActor()->GetComponentByClass<UHealthComponent>())
+		// {
+		// 	OutHit.GetActor()->GetComponentByClass<UHealthComponent>()->Die();
+		// }
 	}
 
 	float Interval = 60.f / FireRate;

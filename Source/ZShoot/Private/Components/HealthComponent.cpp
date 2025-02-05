@@ -7,8 +7,6 @@
 UHealthComponent::UHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	
-	CurrentHealth = MaxHealth;
 }
 
 
@@ -17,6 +15,7 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CurrentHealth = MaxHealth;
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
 	
 }
@@ -34,10 +33,23 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 
 	CurrentHealth -= Damage;
 
-	if (CurrentHealth <= 0.f)
+	if (CurrentHealth <= 0)
 	{
 		CurrentHealth = 0;
-		// GetOwner()->Destroy();
+		Die();
+	}
+}
+
+void UHealthComponent::Die()
+{
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UHealthComponent::DestroyOwner);
+}
+
+void UHealthComponent::DestroyOwner()
+{
+	if (AActor* Owner = GetOwner())
+	{
+		Owner->Destroy();
 	}
 }
 

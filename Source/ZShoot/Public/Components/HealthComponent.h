@@ -27,8 +27,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	float CurrentHealth = 0.f;
 
+	// Functions to process damage and death
 	UFUNCTION()
 	void DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* Instigator, AActor* DamageCauser);
+	void Die();
+	void DestroyOwner();
 
 		
 };
