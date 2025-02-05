@@ -20,6 +20,7 @@ class ZSHOOT_API UPlayerHUDWidget : public UUserWidget
 
 public:
 	void ShowHitMarker();
+	void SetHealthValue(float Value);
 	
 
 protected:
@@ -29,6 +30,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category= "Health", meta=(BindWidget))
 	TObjectPtr<UProgressBar> HealthBar;
+
+	UPROPERTY(BlueprintReadOnly, Category= "Health", meta=(BindWidget))
+	TObjectPtr<UTextBlock> HealthText;
 
 	UPROPERTY(BlueprintReadOnly, Category= "Health", meta=(BindWidget))
 	TObjectPtr<UImage> HitMarker;

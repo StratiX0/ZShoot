@@ -2,6 +2,8 @@
 
 
 #include "Components/HealthComponent.h"
+#include "Pawns/PlayerActor.h"
+#include "Widgets/PlayerHUDWidget.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -37,6 +39,12 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 	{
 		CurrentHealth = 0;
 		Die();
+	}
+
+	APlayerActor* PlayerActor = Cast<APlayerActor>(GetOwner());
+	if (PlayerActor)
+	{
+		PlayerActor->PlayerHUD->SetHealthValue(CurrentHealth / MaxHealth);
 	}
 }
 

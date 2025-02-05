@@ -6,6 +6,7 @@
 #include "Blueprint/WidgetTree.h"
 #include "Components/ProgressBar.h"
 #include "Components/CanvasPanel.h"
+#include "Components/TextBlock.h"
 #include "Components/Image.h"
 
 void UPlayerHUDWidget::NativeConstruct()
@@ -15,11 +16,6 @@ void UPlayerHUDWidget::NativeConstruct()
 	if (CanvasPanel)
 	{
 		WidgetTree->RootWidget = CanvasPanel;
-
-		if (HealthBar)
-		{
-			HealthBar->SetPercent(75.f);
-		}
 	}
 }
 
@@ -29,6 +25,31 @@ void UPlayerHUDWidget::ShowHitMarker()
 	HitMarker->SetColorAndOpacity(HitMarkerColor);
 
 	GetWorld()->GetTimerManager().SetTimer(HitMarkerTimerHandler, this, &UPlayerHUDWidget::FadeHitMarker, HitMarkerFadeTime, true);
+}
+
+void UPlayerHUDWidget::SetHealthValue(float Value)
+{
+	if (HealthBar)
+	{
+		HealthBar->SetPercent(Value);
+		
+		FLinearColor HealthColor;
+		if (Value <= 0.25f)
+		{
+			HealthColor = FLinearColor::Red;
+		}
+		else
+		{
+			HealthColor = FLinearColor::LerpUsingHSV(FLinearColor::Red, FLinearColor::Green, Value);
+		}
+		HealthBar->SetFillColorAndOpacity(HealthColor);
+	}
+
+	if (HealthText)
+	{
+		HealthText->SetText(FText::FromString(FString::Printf(TEXT("%d"), FMath::RoundToInt(Value * 100))));
+	}
+	
 }
 
 void UPlayerHUDWidget::FadeHitMarker()

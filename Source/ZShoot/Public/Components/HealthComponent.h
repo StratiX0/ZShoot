@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ZSHOOT_API UHealthComponent : public UActorComponent
 {
@@ -31,7 +30,5 @@ private:
 	UFUNCTION()
 	void DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* Instigator, AActor* DamageCauser);
 	void Die();
-	void DestroyOwner();
-
-		
+	void DestroyOwner();	
 };
