@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "PlayerActor.generated.h"
 
+class UPlayerHUDWidget;
 class UBoxComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -27,6 +28,10 @@ public:
 	APlayerActor();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaTime) override;
+
+	// HUD Properties
+	UPROPERTY(EditAnywhere, Category="HUD Properties")
+	UPlayerHUDWidget* PlayerHUD;
 
 protected:
 	// Called when the game starts or when spawned
@@ -121,9 +126,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Combat Properties")
 	USoundCue* FireSFX;
 
-
 	// VFX Properties
 	UPROPERTY(EditAnywhere, Category="Shoot Properties")
 	UNiagaraSystem* ShootingVFX;
-	
 };

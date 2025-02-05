@@ -13,6 +13,8 @@
 #include "Components/HealthComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Sound/SoundCue.h"
+#include "Widgets/PlayerHUDWidget.h"
+#include "Pawns/AIZombie.h"
 
 // Sets default values
 APlayerActor::APlayerActor()
@@ -45,7 +47,6 @@ APlayerActor::APlayerActor()
 
 }
 
-// Called when the game starts or when spawned
 void APlayerActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -59,7 +60,6 @@ void APlayerActor::BeginPlay()
 			Subsystem->AddMappingContext(PlayerContext, 0);
 		}
 	}
-	
 }
 
 // Called every frame
@@ -187,6 +187,11 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 		auto DamageTypeClass = UDamageType::StaticClass();		
 		UGameplayStatics::ApplyDamage(OutHit.GetActor(), Damage, GetInstigatorController(), this, DamageTypeClass);
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OutHit.GetActor()->GetName());
+		AAIZombie* Zombie = Cast<AAIZombie>(OutHit.GetActor());
+		if (PlayerHUD && Zombie)
+		{
+			PlayerHUD->ShowHitMarker();
+		}
 	}
 
 	float Interval = 60.f / FireRate;
@@ -198,13 +203,10 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 
 FHitResult APlayerActor::FireRaycast()
 {
-	FRotator CameraRotation = CameraComp->GetComponentRotation();
-	FVector RotXVector = CameraRotation.Vector();
+	FVector Start = CameraComp->GetComponentLocation();
 
-	FVector Start = ShootingPoint->GetComponentLocation();
-
-	int32 distance = 2000;
-	FVector End = (RotXVector * distance) + Start;
+	int distance = 999999999;
+	FVector End = CameraComp->GetComponentLocation() + (CameraComp->GetForwardVector() * distance);
 
 	DrawDebugLine(GetWorld(), Start, End, FColor(255, 0, 0), true, 5, 0, 0.7f);
 
