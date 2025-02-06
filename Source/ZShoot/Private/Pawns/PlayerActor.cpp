@@ -154,10 +154,7 @@ void APlayerActor::SwitchCameraSide(const FInputActionValue& Value)
 {
 	if (!CanSwitchCameraSide) return;
 
-	CameraIsOnRightSide = !CameraIsOnRightSide;
-	
-	CameraIsOnRightSide ? CameraOffsetY = 100.f : CameraOffsetY = -100.f;
-
+	CameraOffsetY *= -1;
 	SpringArmComp->SocketOffset = FVector(0.f, CameraOffsetY, SpringArmComp->SocketOffset.Z);
 
 	CanSwitchCameraSide = false;
