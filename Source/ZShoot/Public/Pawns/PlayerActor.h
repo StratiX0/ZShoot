@@ -16,6 +16,7 @@ class UInputAction;
 class UNiagaraSystem;
 class USoundCue;
 class UHealthComponent;
+class UAmmo;
 /**
  * 
  */
@@ -89,6 +90,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo Components", meta = (AllowPrivateAccess = "true"))
+	UAmmo* AmmoComponent;
 
 	// Movement Properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))

@@ -15,6 +15,7 @@
 #include "Sound/SoundCue.h"
 #include "Widgets/PlayerHUDWidget.h"
 #include "Pawns/AIZombie.h"
+#include "Components/Ammo.h"
 
 // Sets default values
 APlayerActor::APlayerActor()
@@ -44,6 +45,7 @@ APlayerActor::APlayerActor()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+	AmmoComponent = CreateDefaultSubobject<UAmmo>(TEXT("Ammo Component"));
 
 }
 
@@ -165,7 +167,7 @@ void APlayerActor::SwitchCameraSide(const FInputActionValue& Value)
 
 void APlayerActor::Fire(const FInputActionValue& Value)
 {
-	if (!CanShoot) return;
+	if (!CanShoot || !AmmoComponent->EnoughAmmo(1)) return;
 	
 	FHitResult OutHit = FireRaycast();
 
@@ -193,6 +195,8 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 			PlayerHUD->ShowHitMarker();
 		}
 	}
+
+	AmmoComponent->UseAmmo(1);
 
 	float Interval = 60.f / FireRate;
 
