@@ -26,10 +26,40 @@ void APowerUpHeal::BeginPlay()
 	Super::BeginPlay();
 
 	Mesh->OnComponentHit.AddDynamic(this, &APowerUpHeal::OnHit);
+
+	SetStartHealAmount();
+}
+
+void APowerUpHeal::SetStartHealAmount()
+{
+	switch (HealType)
+	{
+	case EPUHealType::Option1:
+		HealAmount = 25.f;
+		Mesh->SetMaterial(0, MaterialsArray[0]);
+		RingMesh->SetMaterial(0, MaterialsArray[0]);
+		break;
+	case EPUHealType::Option2:
+		HealAmount = 50.f;
+		Mesh->SetMaterial(0, MaterialsArray[1]);
+		RingMesh->SetMaterial(0, MaterialsArray[1]);
+		break;
+	case EPUHealType::Option3:
+		HealAmount = 100.f;
+		Mesh->SetMaterial(0, MaterialsArray[2]);
+		RingMesh->SetMaterial(0, MaterialsArray[2]);
+		break;
+	default:
+		HealType = EPUHealType::Option1;
+		HealAmount = 25.f;
+		Mesh->SetMaterial(0, MaterialsArray[0]);
+		RingMesh->SetMaterial(0, MaterialsArray[0]);
+		break;
+	}
 }
 
 void APowerUpHeal::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
+                         FVector NormalImpulse, const FHitResult& Hit)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Hit"));
 	if (APlayerActor* Player = Cast<APlayerActor>(OtherActor))
