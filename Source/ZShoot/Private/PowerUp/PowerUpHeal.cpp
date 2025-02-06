@@ -15,6 +15,9 @@ APowerUpHeal::APowerUpHeal()
 	
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
+
+	RingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ring Mesh"));
+	RingMesh->SetupAttachment(Mesh);
 }
 
 // Called when the game starts or when spawned
