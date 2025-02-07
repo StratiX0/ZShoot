@@ -17,6 +17,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Heal(float HealAmount);
+	bool IsFullHealth() const { return CurrentHealth == MaxHealth; }
 
 protected:
 	// Called when the game starts

@@ -16,6 +16,11 @@ void UAmmo::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentAmmo = MaxAmmo;
+
+	if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+	{
+		Player->PlayerHUD->SetAmmoValue(CurrentAmmo, MaxAmmo);
+	}
 }
 
 void UAmmo::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -27,6 +32,21 @@ void UAmmo::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentT
 void UAmmo::UseAmmo(int AmmoUsed)
 {
 	CurrentAmmo -= AmmoUsed;
+	if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+	{
+		Player->PlayerHUD->SetAmmoValue(CurrentAmmo, MaxAmmo);
+	}
+}
+
+void UAmmo::AddAmmo(int AmmoToAdd)
+{
+	CurrentAmmo += AmmoToAdd;
+
+	if (CurrentAmmo > MaxAmmo)
+	{
+		CurrentAmmo = MaxAmmo;
+	}
+	
 	if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
 	{
 		Player->PlayerHUD->SetAmmoValue(CurrentAmmo, MaxAmmo);

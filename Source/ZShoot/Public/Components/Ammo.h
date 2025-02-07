@@ -23,6 +23,8 @@ public:
 
 	int GetMaxAmmo() const { return MaxAmmo; }
 	int GetCurrentAmmo() const { return CurrentAmmo; }
+	void AddAmmo(int AmmoToAdd);
+	bool IsFull() const { return CurrentAmmo == MaxAmmo; }
 
 protected:
 	virtual void BeginPlay() override;

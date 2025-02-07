@@ -61,11 +61,13 @@ void APowerUpHeal::SetStartHealAmount()
 void APowerUpHeal::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                          FVector NormalImpulse, const FHitResult& Hit)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Hit"));
 	if (APlayerActor* Player = Cast<APlayerActor>(OtherActor))
 	{
-		Player->HealthComponent->Heal(HealAmount);
-		Destroy();
+		if (!Player->HealthComponent->IsFullHealth())
+		{
+			Player->HealthComponent->Heal(HealAmount);
+			Destroy();
+		}
 	}
 }
 
