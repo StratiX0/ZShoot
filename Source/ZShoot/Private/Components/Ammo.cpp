@@ -2,6 +2,8 @@
 
 
 #include "Components/Ammo.h"
+#include "Pawns/PlayerActor.h"
+#include "Widgets/PlayerHUDWidget.h"
 
 UAmmo::UAmmo()
 {
@@ -20,6 +22,15 @@ void UAmmo::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentT
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+}
+
+void UAmmo::UseAmmo(int AmmoUsed)
+{
+	CurrentAmmo -= AmmoUsed;
+	if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+	{
+		Player->PlayerHUD->SetAmmoValue(CurrentAmmo, MaxAmmo);
+	}
 }
 
 

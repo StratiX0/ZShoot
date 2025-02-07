@@ -21,11 +21,11 @@ class ZSHOOT_API UPlayerHUDWidget : public UUserWidget
 public:
 	void ShowHitMarker();
 	void SetHealthValue(float Value);
-	
+	void SetAmmoValue(int CurrentAmmo, int MaxAmmo);
 
 protected:
 	virtual void NativeConstruct() override;
-	UPROPERTY(BlueprintReadOnly, Category= "Health", meta=(BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category= "Canvas", meta=(BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;
 	
 	UPROPERTY(BlueprintReadOnly, Category= "Health", meta=(BindWidget))
@@ -34,9 +34,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category= "Health", meta=(BindWidget))
 	TObjectPtr<UTextBlock> HealthText;
 
-	UPROPERTY(BlueprintReadOnly, Category= "Health", meta=(BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category= "Shoot", meta=(BindWidget))
 	TObjectPtr<UImage> HitMarker;
 
+	UPROPERTY(BlueprintReadOnly, Category= "Ammo", meta=(BindWidget))
+	TObjectPtr<UTextBlock> AmmoText;
+	
 	FTimerHandle HitMarkerTimerHandler;
 	float HitMarkerFadeTime = 0.05f;
 	

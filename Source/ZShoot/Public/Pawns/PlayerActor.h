@@ -132,6 +132,9 @@ private:
 	USoundCue* FireSFX;
 
 	// VFX Properties
+	UPROPERTY(EditAnywhere, Category="VFX Properties")
+	UNiagaraSystem* MuzzleFlashVFX;
+
 	UPROPERTY(EditAnywhere, Category="Shoot Properties")
-	UNiagaraSystem* ShootingVFX;
+	UNiagaraSystem* BloodSplashVFX;
 };

@@ -168,9 +168,9 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 	
 	FHitResult OutHit = FireRaycast();
 
-	if (ShootingVFX)
+	if (MuzzleFlashVFX)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ShootingVFX, ShootingPoint->GetComponentLocation(), ShootingPoint->GetComponentRotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MuzzleFlashVFX, ShootingPoint->GetComponentLocation(), ShootingPoint->GetComponentRotation());
 	}
 
 	if (FireSFX)
@@ -190,6 +190,8 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 		if (PlayerHUD && Zombie)
 		{
 			PlayerHUD->ShowHitMarker();
+			
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BloodSplashVFX, OutHit.Location, OutHit.ImpactNormal.Rotation());
 		}
 	}
 

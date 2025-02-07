@@ -19,14 +19,6 @@ void UPlayerHUDWidget::NativeConstruct()
 	}
 }
 
-void UPlayerHUDWidget::ShowHitMarker()
-{
-	FLinearColor HitMarkerColor = FLinearColor(1.f, 1.f, 1.f, 1.f);
-	HitMarker->SetColorAndOpacity(HitMarkerColor);
-
-	GetWorld()->GetTimerManager().SetTimer(HitMarkerTimerHandler, this, &UPlayerHUDWidget::FadeHitMarker, HitMarkerFadeTime, true);
-}
-
 void UPlayerHUDWidget::SetHealthValue(float Value)
 {
 	if (HealthBar)
@@ -50,6 +42,22 @@ void UPlayerHUDWidget::SetHealthValue(float Value)
 		HealthText->SetText(FText::FromString(FString::Printf(TEXT("%d"), FMath::RoundToInt(Value * 100))));
 	}
 	
+}
+
+void UPlayerHUDWidget::SetAmmoValue(int CurrentAmmo, int MaxAmmo)
+{
+	if (AmmoText)
+	{
+		AmmoText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo)));
+	}
+}
+
+void UPlayerHUDWidget::ShowHitMarker()
+{
+	FLinearColor HitMarkerColor = FLinearColor(1.f, 1.f, 1.f, 1.f);
+	HitMarker->SetColorAndOpacity(HitMarkerColor);
+
+	GetWorld()->GetTimerManager().SetTimer(HitMarkerTimerHandler, this, &UPlayerHUDWidget::FadeHitMarker, HitMarkerFadeTime, true);
 }
 
 void UPlayerHUDWidget::FadeHitMarker()

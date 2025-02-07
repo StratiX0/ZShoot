@@ -7,6 +7,7 @@
 #include "Ammo.generated.h"
 
 
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ZSHOOT_API UAmmo : public UActorComponent
 {
@@ -17,7 +18,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool EnoughAmmo(int AmmoNeeded) const { return CurrentAmmo >= AmmoNeeded; }
-	void UseAmmo(int AmmoUsed) { CurrentAmmo -= AmmoUsed; }
+	void UseAmmo(int AmmoUsed);
+
+
+	int GetMaxAmmo() const { return MaxAmmo; }
+	int GetCurrentAmmo() const { return CurrentAmmo; }
 
 protected:
 	virtual void BeginPlay() override;
