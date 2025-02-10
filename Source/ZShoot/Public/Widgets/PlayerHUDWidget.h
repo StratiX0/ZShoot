@@ -22,6 +22,9 @@ public:
 	void ShowHitMarker();
 	void SetHealthValue(float Value);
 	void SetAmmoValue(int CurrentAmmo, int MaxAmmo);
+	void UpdateReloadBar(float Value);
+	void ShowReloadBar();
+	void HideReloadBar();
 
 	void StartWaveTimer(float Time);
 
@@ -42,7 +45,13 @@ protected:
 	TObjectPtr<UImage> HitMarker;
 
 	UPROPERTY(BlueprintReadOnly, Category= "Ammo", meta=(BindWidget))
-	TObjectPtr<UTextBlock> AmmoText;
+	TObjectPtr<UTextBlock> AmmoText1;
+
+	UPROPERTY(BlueprintReadOnly, Category= "Ammo", meta=(BindWidget))
+	TObjectPtr<UTextBlock> AmmoText2;
+
+	UPROPERTY(BlueprintReadOnly, Category= "Ammo", meta=(BindWidget))
+	TObjectPtr<UProgressBar> ReloadBar;
 
 	UPROPERTY(BlueprintReadOnly, Category= "Timer", meta=(BindWidget))
 	TObjectPtr<UTextBlock> WaveTimer;
@@ -56,4 +65,7 @@ private:
 	void HideWaveTimer();
 
 	float RemainingTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation Properties", meta = (AllowPrivateAccess = "true"))
+	float HitMarkerFadeSpeed = 10.f;
 };

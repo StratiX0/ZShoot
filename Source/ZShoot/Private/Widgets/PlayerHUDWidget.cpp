@@ -19,6 +19,7 @@ void UPlayerHUDWidget::NativeConstruct()
 	}
 
 	HideWaveTimer();
+	HideReloadBar();
 }
 
 void UPlayerHUDWidget::SetHealthValue(float Value)
@@ -48,9 +49,26 @@ void UPlayerHUDWidget::SetHealthValue(float Value)
 
 void UPlayerHUDWidget::SetAmmoValue(int CurrentAmmo, int MaxAmmo)
 {
-	if (AmmoText)
+	if (AmmoText1 && AmmoText2)
 	{
-		AmmoText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo)));
+		AmmoText1->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
+		AmmoText2->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
+	}
+}
+
+void UPlayerHUDWidget::UpdateReloadBar(float Value)
+{
+	if (ReloadBar)
+	{
+		ReloadBar->SetPercent(Value);
+	}
+}
+
+void UPlayerHUDWidget::ShowReloadBar()
+{
+	if (ReloadBar)
+	{
+		ReloadBar->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
@@ -65,14 +83,16 @@ void UPlayerHUDWidget::ShowHitMarker()
 void UPlayerHUDWidget::FadeHitMarker()
 {
 	FLinearColor CurrentColor = HitMarker->GetColorAndOpacity();
-	FLinearColor TargetColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
+	float TargetAlpha = 0.f;
 
-	FLinearColor NewColor = FMath::Lerp(CurrentColor, TargetColor, 0.1f);
-	HitMarker->SetColorAndOpacity(NewColor);
+	CurrentColor.A = FMath::FInterpTo(CurrentColor.A, TargetAlpha, GetWorld()->GetDeltaSeconds(), HitMarkerFadeSpeed);
+	HitMarker->SetColorAndOpacity(CurrentColor);
 
-	if (NewColor.A <= HitMarkerFadeTime)
+	if (CurrentColor.A <= 0.01f)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(HitMarkerTimerHandler);
+		HitMarkerTimerHandler.Invalidate();
+		CurrentColor.A = 0.f;
+		HitMarker->SetColorAndOpacity(CurrentColor);
 	}
 }
 
@@ -114,4 +134,9 @@ void UPlayerHUDWidget::UpdateWaveTimer()
 void UPlayerHUDWidget::HideWaveTimer()
 {
 	WaveTimer->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UPlayerHUDWidget::HideReloadBar()
+{
+	ReloadBar->SetVisibility(ESlateVisibility::Hidden);
 }

@@ -26,6 +26,15 @@ void UAmmo::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentT
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (IsReloading)
+	{
+		RemainingReloadTime -= DeltaTime;
+		if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+		{
+			float ReloadProgress = FMath::Clamp((ReloadTime - RemainingReloadTime) / ReloadTime, 0.f, 1.f);
+			Player->PlayerHUD->UpdateReloadBar(ReloadProgress);
+		}
+	}
 }
 
 void UAmmo::DisplayAmmo()
@@ -57,8 +66,6 @@ void UAmmo::UseAmmo(int AmmoUsed)
 
 void UAmmo::Reload()
 {
-	if (CurrentAmmoInMag == MagCapacity) return;
-
 	IsReloading = true;
 	
 	if (CurrentAmmo < MagCapacity)
@@ -73,17 +80,27 @@ void UAmmo::Reload()
 		CurrentAmmoInMag += Difference;
 	}
 	IsReloading = false;
+
+	if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+	{
+		Player->PlayerHUD->HideReloadBar();
+	}
 	
 	DisplayAmmo();
 }
 
 void UAmmo::MakeReload()
 {
-	if (IsReloading) return;
-	
+	if (IsReloading || CurrentAmmoInMag == MagCapacity) return;
+
 	IsReloading = true;
+	RemainingReloadTime = ReloadTime;
 	ReloadTimerHandler.Invalidate();
 	GetOwner()->GetWorldTimerManager().SetTimer(ReloadTimerHandler, this, &UAmmo::Reload, ReloadTime, false);
+	if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+	{
+		Player->PlayerHUD->ShowReloadBar();
+	}
 }
 
 void UAmmo::AddAmmo(int AmmoToAdd)

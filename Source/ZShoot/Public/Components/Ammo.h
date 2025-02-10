@@ -50,6 +50,7 @@ private:
 	
 	FTimerHandle ReloadTimerHandler;
 
+	float RemainingReloadTime = 0.f;
 	bool IsReloading = false;
 	
 };
