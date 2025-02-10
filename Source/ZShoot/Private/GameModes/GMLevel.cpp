@@ -10,4 +10,5 @@ void AGMLevel::BeginPlay()
 
 	UGILevel* GameInstance = Cast<UGILevel>(GetGameInstance());
 	GameInstance->CreatePlayerHUD();
+	GameInstance->StartWave();
 }

@@ -2,6 +2,10 @@
 
 
 #include "Components/HealthComponent.h"
+
+#include "GameInstances/GILevel.h"
+#include "Kismet/GameplayStatics.h"
+#include "Pawns/AIZombie.h"
 #include "Pawns/PlayerActor.h"
 #include "Widgets/PlayerHUDWidget.h"
 
@@ -62,6 +66,27 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 
 void UHealthComponent::Die()
 {
+	if (APlayerActor* PlayerActor = Cast<APlayerActor>(GetOwner()))
+	{
+		// Obtenez l'instance du GameInstance pour redémarrer le niveau
+		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
+		{
+			// Relancer le niveau quand le joueur meurt
+			GameInstance->RestartLevel();
+			return;
+		}
+	}
+
+	if (AAIZombie* EnemyActor = Cast<AAIZombie>(GetOwner()))
+	{
+		// Obtenez l'instance du GameInstance pour redémarrer le niveau
+		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
+		{
+			// Relancer le niveau quand le joueur meurt
+			GameInstance->OnEnemyDeath();
+		}
+	}
+	
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UHealthComponent::DestroyOwner);
 }
 
