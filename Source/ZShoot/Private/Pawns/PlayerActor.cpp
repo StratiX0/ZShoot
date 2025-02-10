@@ -224,7 +224,7 @@ FHitResult APlayerActor::FireRaycast()
 	int distance = 999999999;
 	FVector End = CameraComp->GetComponentLocation() + (CameraComp->GetForwardVector() * distance);
 
-	DrawDebugLine(GetWorld(), Start, End, FColor(255, 0, 0), true, 5, 0, 0.7f);
+	// DrawDebugLine(GetWorld(), Start, End, FColor(255, 0, 0), true, 5, 0, 0.7f);
 
 	FHitResult OutHit;
 	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);

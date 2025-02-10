@@ -23,6 +23,10 @@ public:
 	void SetHealthValue(float Value);
 	void SetAmmoValue(int CurrentAmmo, int MaxAmmo);
 
+	void StartWaveTimer(float Time);
+
+	FTimerHandle WaveTimerHandle;
+
 protected:
 	virtual void NativeConstruct() override;
 	UPROPERTY(BlueprintReadOnly, Category= "Canvas", meta=(BindWidget))
@@ -39,11 +43,17 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category= "Ammo", meta=(BindWidget))
 	TObjectPtr<UTextBlock> AmmoText;
+
+	UPROPERTY(BlueprintReadOnly, Category= "Timer", meta=(BindWidget))
+	TObjectPtr<UTextBlock> WaveTimer;
 	
 	FTimerHandle HitMarkerTimerHandler;
 	float HitMarkerFadeTime = 0.05f;
 	
 private:
 	void FadeHitMarker();
-	
+	void UpdateWaveTimer();
+	void HideWaveTimer();
+
+	float RemainingTime;
 };

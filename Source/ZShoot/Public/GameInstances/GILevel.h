@@ -34,13 +34,19 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Wave Settings")
 	TSubclassOf<AActor> EnemyClass;
+	UPROPERTY(EditAnywhere, Category = "Wave Settings")
+	int EnemiesPerWave = 2;
 
 	UPROPERTY(EditAnywhere, Category = "Wave Settings")
-	int32 EnemiesPerWave = 5;
+	float SpawnTime = 1.0f;
+	UPROPERTY(EditAnywhere, Category = "Wave Settings")
+	float WaveTime = 5.0f;
+
 	
 	int SpawnedEnemies = 0;
 	int CurrentWave = 1;
 	int EnemiesAlive = 0;
 	void SpawnEnemy();
 	void NextWave();
+	void StartEnemySpawn();
 };
