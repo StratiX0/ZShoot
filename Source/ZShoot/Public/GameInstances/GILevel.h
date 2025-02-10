@@ -17,6 +17,12 @@ class ZSHOOT_API UGILevel : public UGameInstance
 
 public:
 	void CreatePlayerHUD();
+	void StartWave();
+	void RestartLevel();
+	void OnEnemyDeath();
+
+	FTimerHandle SpawnTimerHandle;
+	FTimerHandle WaveTimerHandle;
 
 protected:
 
@@ -25,5 +31,16 @@ private:
 	TSubclassOf<UPlayerHUDWidget> PlayerHUDClass;
 	UPROPERTY(EditAnywhere, Category = "HUD Properties")
 	UPlayerHUDWidget* PlayerHUD;
+
+	UPROPERTY(EditAnywhere, Category = "Wave Settings")
+	TSubclassOf<AActor> EnemyClass;
+
+	UPROPERTY(EditAnywhere, Category = "Wave Settings")
+	int32 EnemiesPerWave = 5;
 	
+	int SpawnedEnemies = 0;
+	int CurrentWave = 1;
+	int EnemiesAlive = 0;
+	void SpawnEnemy();
+	void NextWave();
 };
