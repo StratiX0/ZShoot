@@ -40,8 +40,18 @@ void UGILevel::StartWave()
 {
 	SpawnedEnemies = 0;
 	EnemiesAlive = EnemiesPerWave * CurrentWave;
-    
-	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &UGILevel::SpawnEnemy, 2.0f, true);
+	
+	if (PlayerHUD)
+	{
+		PlayerHUD->StartWaveTimer(WaveTime);
+	}
+	GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &UGILevel::StartEnemySpawn, WaveTime, false);
+}
+
+void UGILevel::StartEnemySpawn()
+{
+	// Commencer le spawn des ennemis après que le timer de la vague est terminé
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &UGILevel::SpawnEnemy, SpawnTime, true);
 }
 
 void UGILevel::SpawnEnemy()
@@ -81,8 +91,7 @@ void UGILevel::OnEnemyDeath()
 	if (EnemiesAlive <= 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Vague %d terminée. Préparation de la suivante..."), CurrentWave);
-
-		GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &UGILevel::NextWave, 5.0f, false);
+		NextWave();
 	}
 }
 

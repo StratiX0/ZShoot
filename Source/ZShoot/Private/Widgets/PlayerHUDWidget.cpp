@@ -17,6 +17,8 @@ void UPlayerHUDWidget::NativeConstruct()
 	{
 		WidgetTree->RootWidget = CanvasPanel;
 	}
+
+	HideWaveTimer();
 }
 
 void UPlayerHUDWidget::SetHealthValue(float Value)
@@ -72,4 +74,44 @@ void UPlayerHUDWidget::FadeHitMarker()
 	{
 		GetWorld()->GetTimerManager().ClearTimer(HitMarkerTimerHandler);
 	}
+}
+
+void UPlayerHUDWidget::StartWaveTimer(float Time)
+{
+	if (WaveTimer)
+	{
+		WaveTimer->SetText(FText::AsNumber(Time));
+
+		WaveTimer->SetVisibility(ESlateVisibility::Visible);
+
+		GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &UPlayerHUDWidget::UpdateWaveTimer, 1.0f, true);
+
+		RemainingTime = Time;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WaveTimer is null!"));
+	}
+}
+
+void UPlayerHUDWidget::UpdateWaveTimer()
+{
+	int RoundedTime = FMath::CeilToInt(RemainingTime);
+	WaveTimer->SetText(FText::AsNumber(RoundedTime));
+	
+	if (RemainingTime <= 0)
+	{
+		WaveTimer->SetText(FText::FromString(TEXT("GO!")));
+		
+		GetWorld()->GetTimerManager().ClearTimer(WaveTimerHandle);
+		
+		GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &UPlayerHUDWidget::HideWaveTimer, 1.0f, false);
+	}
+
+	RemainingTime -= 1.0f;
+}
+
+void UPlayerHUDWidget::HideWaveTimer()
+{
+	WaveTimer->SetVisibility(ESlateVisibility::Hidden);
 }
