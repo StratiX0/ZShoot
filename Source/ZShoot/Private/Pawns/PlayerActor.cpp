@@ -94,6 +94,10 @@ void APlayerActor::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		{
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &APlayerActor::Fire);
 		}
+		if (ReloadAction)
+		{
+			EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &APlayerActor::Reload);
+		}
 	}
 }
 
@@ -164,7 +168,7 @@ void APlayerActor::SwitchCameraSide(const FInputActionValue& Value)
 
 void APlayerActor::Fire(const FInputActionValue& Value)
 {
-	if (!CanShoot || !AmmoComponent->EnoughAmmo(1)) return;
+	if (!CanShoot || !AmmoComponent->EnoughAmmo(1) || AmmoComponent->GetIsReloading()) return;
 	
 	FHitResult OutHit = FireRaycast();
 
@@ -190,8 +194,17 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 		if (PlayerHUD && Zombie)
 		{
 			PlayerHUD->ShowHitMarker();
+
+			FFXSystemSpawnParameters Params;
+			Params.WorldContextObject = this;
+			Params.SystemTemplate = BloodSplashVFX;
+			Params.Location = OutHit.Location;
+			FRotator Rot = FRotationMatrix::MakeFromZ(OutHit.ImpactNormal).Rotator();
+			Params.Rotation = Rot;
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OutHit.ImpactNormal.ToString());
+			Params.Scale = FVector::OneVector;
 			
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BloodSplashVFX, OutHit.Location, OutHit.ImpactNormal.Rotation());
+			UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(Params);
 		}
 	}
 
@@ -221,5 +234,10 @@ FHitResult APlayerActor::FireRaycast()
 	GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, RV_TraceParams);
 
 	return OutHit;
+}
+
+void APlayerActor::Reload(const FInputActionValue& Value)
+{
+	AmmoComponent->MakeReload();
 }
 

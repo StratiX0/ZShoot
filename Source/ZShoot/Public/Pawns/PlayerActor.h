@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "InputActionValue.h"
+#include "Components/Ammo.h"
 #include "PlayerActor.generated.h"
 
 class UPlayerHUDWidget;
@@ -60,6 +61,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category= "Input")
 	UInputAction* FireAction;
 
+	UPROPERTY(EditAnywhere, Category= "Input")
+	UInputAction* ReloadAction;
+
 	void Move(const FInputActionValue& Value);
 	void LookAround(const FInputActionValue& Value);
 	
@@ -69,6 +73,8 @@ protected:
 
 	void Fire(const FInputActionValue& Value);
 	FHitResult FireRaycast();
+
+	void Reload(const FInputActionValue& Value);
 
 private:
 
