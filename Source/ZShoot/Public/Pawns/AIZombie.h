@@ -1,9 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "AIZombie.generated.h"
 
 class UBoxComponent;
@@ -11,7 +9,7 @@ class UHealthComponent;
 class APlayerActor;
 
 UCLASS()
-class ZSHOOT_API AAIZombie : public APawn
+class ZSHOOT_API AAIZombie : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -23,14 +21,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:	
+private:
 	// Model Components
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Assets", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* SkeletalMesh;
+	USkeletalMeshComponent* SkeletalMeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Assets", meta = (AllowPrivateAccess = "true"))
-	UPhysicsAsset* SkeletonPhysicsAssets;
-	
+	TSoftObjectPtr<USkeletalMesh> SkeletalMeshAsset;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent;
 
@@ -60,5 +58,4 @@ private:
 	void Attack();
 	void AllowAttack();
 	FTimerHandle AttackTimerHandler;
-
 };

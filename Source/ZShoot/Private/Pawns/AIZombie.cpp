@@ -1,102 +1,95 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Pawns/AIZombie.h"
-#include "Components/BoxComponent.h"
 #include "Components/HealthComponent.h"
 #include "Pawns/PlayerActor.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
 AAIZombie::AAIZombie()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+ PrimaryActorTick.bCanEverTick = true;
 
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Skeletal Mesh"));
-	SkeletalMesh->SetPhysicsAsset(SkeletonPhysicsAssets);
-	RootComponent = SkeletalMesh;
-	
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+
+ SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
+ RootComponent = SkeletalMeshComponent;
+
+ SkeletalMeshComponent->SetSkeletalMesh(SkeletalMeshAsset.Get());
+
+ HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
-// Called when the game starts or when spawned
 void AAIZombie::BeginPlay()
 {
-	Super::BeginPlay();
+ Super::BeginPlay();
 
-	PlayerActor = Cast<APlayerActor>(UGameplayStatics::GetPlayerPawn(this, 0));
+ PlayerActor = Cast<APlayerActor>(UGameplayStatics::GetPlayerPawn(this, 0));
 
-	GetWorldTimerManager().SetTimer(AttackTimerHandler, this, &AAIZombie::AllowAttack, AttackRate, true);
+ GetWorldTimerManager().SetTimer(AttackTimerHandler, this, &AAIZombie::AllowAttack, AttackRate, true);
 }
 
-// Called every frame
 void AAIZombie::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+ Super::Tick(DeltaTime);
 
-	if (InChasingRange())
-	{
-		Chasing();
-	}
+ if (InChasingRange())
+ {
+  Chasing();
+ }
 }
 
 bool AAIZombie::InChasingRange()
 {
-	if (PlayerActor)
-	{
-		float Distance = FVector::Dist(GetActorLocation(), PlayerActor->GetActorLocation());
-		if (Distance <= ChasingRange)
-		{
-			return true;
-		}
-	}
-	return false;
+ if (PlayerActor)
+ {
+  float Distance = FVector::Dist(GetActorLocation(), PlayerActor->GetActorLocation());
+  if (Distance <= ChasingRange)
+  {
+   return true;
+  }
+ }
+ return false;
 }
 
 void AAIZombie::Chasing()
 {
-	if (PlayerActor)
-	{
-		FVector DeltaLocation = PlayerActor->GetActorLocation() - GetActorLocation();
-		DeltaLocation = DeltaLocation.GetSafeNormal() * Speed * UGameplayStatics::GetWorldDeltaSeconds(this);
-		DeltaLocation.Z = 0.f;
-		AddActorLocalOffset(DeltaLocation, true);
-	}
+ if (PlayerActor)
+ {
+  FVector DeltaLocation = PlayerActor->GetActorLocation() - GetActorLocation();
+  DeltaLocation = DeltaLocation.GetSafeNormal() * Speed * UGameplayStatics::GetWorldDeltaSeconds(this);
+  DeltaLocation.Z = 0.f;
+  AddActorLocalOffset(DeltaLocation, true);
+ }
 }
 
 bool AAIZombie::InAttackRange()
 {
-	if (PlayerActor)
-	{
-		float Distance = FVector::Dist(GetActorLocation(), PlayerActor->GetActorLocation());
-		if (Distance <= AttackRange)
-		{
-			return true;
-		}
-	}
-	return false;
+ if (PlayerActor)
+ {
+  float Distance = FVector::Dist(GetActorLocation(), PlayerActor->GetActorLocation());
+  if (Distance <= AttackRange)
+  {
+   return true;
+  }
+ }
+ return false;
 }
 
 void AAIZombie::Attack()
 {
-	if (!CanAttack) return;
-	
-	if (PlayerActor)
-	{
-		auto DamageTypeClass = UDamageType::StaticClass();		
-		UGameplayStatics::ApplyDamage(PlayerActor, Damage, GetInstigatorController(), this, DamageTypeClass);
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, PlayerActor->GetName());
-	}
-	CanAttack = false;
+ if (!CanAttack) return;
+
+ if (PlayerActor)
+ {
+  auto DamageTypeClass = UDamageType::StaticClass();
+  UGameplayStatics::ApplyDamage(PlayerActor, Damage, GetInstigatorController(), this, DamageTypeClass);
+  GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, PlayerActor->GetName());
+ }
+ CanAttack = false;
 }
 
 void AAIZombie::AllowAttack()
 {
-	CanAttack = true;
-	if (InAttackRange())
-	{
-		Attack();
-	}
+ CanAttack = true;
+ if (InAttackRange())
+ {
+  Attack();
+ }
 }
-
