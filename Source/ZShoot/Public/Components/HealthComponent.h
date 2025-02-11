@@ -18,6 +18,7 @@ public:
 
 	void Heal(float HealAmount);
 	bool IsFullHealth() const { return CurrentHealth == MaxHealth; }
+	void DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* Instigator, AActor* DamageCauser);
 
 protected:
 	// Called when the game starts
@@ -31,7 +32,7 @@ private:
 
 	// Functions to process damage and death
 	UFUNCTION()
-	void DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* Instigator, AActor* DamageCauser);
+	
 	void Die();
 	void DestroyOwner();	
 };

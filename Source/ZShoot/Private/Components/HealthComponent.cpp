@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Pawns/AIZombie.h"
 #include "Pawns/PlayerActor.h"
+#include "Pawns/Zombie.h"
 #include "Widgets/PlayerHUDWidget.h"
 
 // Sets default values for this component's properties
@@ -49,6 +50,8 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 {
 	if (Damage <= 0.f) return;
 
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Damage Taken"));
+
 	CurrentHealth -= Damage;
 
 	if (CurrentHealth <= 0)
@@ -78,6 +81,16 @@ void UHealthComponent::Die()
 	}
 
 	if (AAIZombie* EnemyActor = Cast<AAIZombie>(GetOwner()))
+	{
+		// Obtenez l'instance du GameInstance pour redémarrer le niveau
+		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
+		{
+			// Relancer le niveau quand le joueur meurt
+			GameInstance->OnEnemyDeath();
+		}
+	}
+
+	if (AZombie* EnemyActor = Cast<AZombie>(GetOwner()))
 	{
 		// Obtenez l'instance du GameInstance pour redémarrer le niveau
 		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
