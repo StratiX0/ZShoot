@@ -215,6 +215,7 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 	ShootTimerHandler.Invalidate();
 	GetWorldTimerManager().SetTimer(ShootTimerHandler, this, &APlayerActor::AllowShoot, Interval, false);
 	CanShoot = false;
+	
 }
 
 FHitResult APlayerActor::FireRaycast()

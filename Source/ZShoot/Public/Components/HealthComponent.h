@@ -24,9 +24,9 @@ protected:
 	virtual void BeginPlay() override;
 
 private:	
-	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPROPERTY(EditAnywhere, Category = "Components")
 	float MaxHealth = 100.f;
-	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPROPERTY(EditAnywhere, Category = "Components")
 	float CurrentHealth = 0.f;
 
 	// Functions to process damage and death

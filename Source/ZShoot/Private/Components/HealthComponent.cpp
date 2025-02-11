@@ -68,10 +68,8 @@ void UHealthComponent::Die()
 {
 	if (APlayerActor* PlayerActor = Cast<APlayerActor>(GetOwner()))
 	{
-		// Obtenez l'instance du GameInstance pour redémarrer le niveau
 		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
 		{
-			// Relancer le niveau quand le joueur meurt
 			GameInstance->RestartLevel();
 			return;
 		}
@@ -79,10 +77,8 @@ void UHealthComponent::Die()
 
 	if (AAIZombie* EnemyActor = Cast<AAIZombie>(GetOwner()))
 	{
-		// Obtenez l'instance du GameInstance pour redémarrer le niveau
 		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
 		{
-			// Relancer le niveau quand le joueur meurt
 			GameInstance->OnEnemyDeath();
 		}
 	}

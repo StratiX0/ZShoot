@@ -29,6 +29,8 @@ void UGILevel::CreatePlayerHUD()
 	{
 		PlayerActor->PlayerHUD = Cast<UPlayerHUDWidget>(PlayerHUD);
 	}
+
+	PlayerHUD->StartTimer();
 }
 
 void UGILevel::RestartLevel()
@@ -39,7 +41,8 @@ void UGILevel::RestartLevel()
 void UGILevel::StartWave()
 {
 	SpawnedEnemies = 0;
-	EnemiesAlive = EnemiesPerWave * CurrentWave;
+	float RandomFactor = FMath::FRandRange(0.8f, 1.2f);
+	EnemiesToSpawn = FMath::CeilToInt(InitialEnemy * FMath::Exp(GrowthRate * (CurrentWave - 1)) * RandomFactor);	EnemiesAlive = EnemiesToSpawn;
 	
 	if (PlayerHUD)
 	{
@@ -50,13 +53,12 @@ void UGILevel::StartWave()
 
 void UGILevel::StartEnemySpawn()
 {
-	// Commencer le spawn des ennemis après que le timer de la vague est terminé
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &UGILevel::SpawnEnemy, SpawnTime, true);
 }
 
 void UGILevel::SpawnEnemy()
 {
-	if (SpawnedEnemies < EnemiesAlive)
+	if (SpawnedEnemies < EnemiesToSpawn)
 	{
 		if (!EnemyClass)
 		{
@@ -87,6 +89,8 @@ void UGILevel::OnEnemyDeath()
 {
 	EnemiesAlive--;
 	UE_LOG(LogTemp, Warning, TEXT("Ennemi éliminé!"));
+
+	PlayerHUD->IncreaseKillCount(1);
 
 	if (EnemiesAlive <= 0)
 	{

@@ -37,23 +37,23 @@ private:
 	APlayerActor* PlayerActor;
 
 	// Movement Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
 	float Speed = 200.f;
 
 	// --------------------------------------- Combat Properties ---------------------------------------
 
 	// Chasing Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
 	float ChasingRange = 1000.f;
 	bool InChasingRange();
 	void Chasing();
 
 	// Attacking Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
 	float Damage = 10.f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
 	float AttackRate = 1.f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
 	float AttackRange = 1000.f;
 	bool CanAttack = true;
 	bool InAttackRange();

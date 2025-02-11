@@ -100,7 +100,7 @@ void UPlayerHUDWidget::StartWaveTimer(float Time)
 {
 	if (WaveTimer)
 	{
-		WaveTimer->SetText(FText::AsNumber(Time));
+		WaveTimer->SetText(FText::FromString(TEXT("Wave Start!")));
 
 		WaveTimer->SetVisibility(ESlateVisibility::Visible);
 
@@ -140,3 +140,29 @@ void UPlayerHUDWidget::HideReloadBar()
 {
 	ReloadBar->SetVisibility(ESlateVisibility::Hidden);
 }
+
+void UPlayerHUDWidget::IncreaseKillCount(int kill)
+{
+	KillCount += kill;
+
+	if (KillsNumberText)
+	{
+		KillsNumberText->SetText(FText::FromString(FString::Printf(TEXT("%d"), KillCount)));
+	}
+}
+
+void UPlayerHUDWidget::StartTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UPlayerHUDWidget::UpdateTimer, 1.0f, true);
+}
+
+void UPlayerHUDWidget::UpdateTimer()
+{
+	GameTimer++;
+	int Minutes = GameTimer / 60;
+	int Seconds = GameTimer % 60;
+
+	TimerText->SetText(FText::FromString(FString::Printf(TEXT("%d'%02d"), Minutes, Seconds)));
+}
+
+

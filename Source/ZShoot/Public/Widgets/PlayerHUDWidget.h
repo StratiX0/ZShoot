@@ -27,8 +27,11 @@ public:
 	void HideReloadBar();
 
 	void StartWaveTimer(float Time);
+	void StartTimer();
+	void IncreaseKillCount(int kill);
 
 	FTimerHandle WaveTimerHandle;
+	FTimerHandle TimerHandle;
 
 protected:
 	virtual void NativeConstruct() override;
@@ -55,6 +58,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category= "Timer", meta=(BindWidget))
 	TObjectPtr<UTextBlock> WaveTimer;
+
+	UPROPERTY(BlueprintReadOnly, Category= "Timer", meta=(BindWidget))
+	TObjectPtr<UTextBlock> TimerText;
+
+	UPROPERTY(BlueprintReadOnly, Category= "Kill", meta=(BindWidget))
+	TObjectPtr<UTextBlock> KillsNumberText;
 	
 	FTimerHandle HitMarkerTimerHandler;
 	float HitMarkerFadeTime = 0.05f;
@@ -63,9 +72,12 @@ private:
 	void FadeHitMarker();
 	void UpdateWaveTimer();
 	void HideWaveTimer();
+	void UpdateTimer();
 
 	float RemainingTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation Properties", meta = (AllowPrivateAccess = "true"))
 	float HitMarkerFadeSpeed = 10.f;
+	int KillCount = 0;
+	int GameTimer = 0;
 };
