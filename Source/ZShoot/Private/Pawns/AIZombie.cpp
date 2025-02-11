@@ -13,12 +13,10 @@ AAIZombie::AAIZombie()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
-	RootComponent = BoxComp;
+	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Skeletal Mesh"));
+	SkeletalMesh->SetPhysicsAsset(SkeletonPhysicsAssets);
+	RootComponent = SkeletalMesh;
 	
-	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
-	BodyMesh->SetupAttachment(BoxComp);
-
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 

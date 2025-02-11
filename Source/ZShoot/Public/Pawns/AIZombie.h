@@ -25,12 +25,12 @@ protected:
 
 private:	
 	// Model Components
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoxComp;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Assets", meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* SkeletalMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* BodyMesh;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Assets", meta = (AllowPrivateAccess = "true"))
+	UPhysicsAsset* SkeletonPhysicsAssets;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent;
 
