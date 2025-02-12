@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Pawns/AIZombie.h"
 #include "Pawns/PlayerActor.h"
+#include "Pawns/Zombie.h"
 #include "Widgets/PlayerHUDWidget.h"
 
 // Sets default values for this component's properties
@@ -76,6 +77,14 @@ void UHealthComponent::Die()
 	}
 
 	if (AAIZombie* EnemyActor = Cast<AAIZombie>(GetOwner()))
+	{
+		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
+		{
+			GameInstance->OnEnemyDeath();
+		}
+	}
+
+	if (AZombie* EnemyActor = Cast<AZombie>(GetOwner()))
 	{
 		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
 		{
