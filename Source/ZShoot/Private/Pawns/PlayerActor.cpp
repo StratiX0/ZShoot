@@ -16,6 +16,7 @@
 #include "Widgets/PlayerHUDWidget.h"
 #include "Pawns/AIZombie.h"
 #include "Components/Ammo.h"
+#include "Pawns/Zombie.h"
 
 // Sets default values
 APlayerActor::APlayerActor()
@@ -191,7 +192,8 @@ void APlayerActor::Fire(const FInputActionValue& Value)
 		UGameplayStatics::ApplyDamage(OutHit.GetActor(), Damage, GetInstigatorController(), this, DamageTypeClass);
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OutHit.GetActor()->GetName());
 		AAIZombie* Zombie = Cast<AAIZombie>(OutHit.GetActor());
-		if (PlayerHUD && Zombie)
+		AZombie* Zombies = Cast<AZombie>(OutHit.GetActor());
+		if (PlayerHUD && Zombies)
 		{
 			PlayerHUD->ShowHitMarker();
 
