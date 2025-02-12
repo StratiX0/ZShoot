@@ -19,6 +19,15 @@ enum class EZombieState : uint8
 	Attack UMETA(DisplayName = "Attack")
 };
 
+UENUM(BlueprintType)
+enum class EZombieAnimation : uint8
+{
+	Idle UMETA(DisplayName = "Idle Animation"),
+	Chase UMETA(DisplayName = "Chase Animation"),
+	Wander UMETA(DisplayName = "Wander Animation"),
+	Attack UMETA(DisplayName = "Attack Animation")
+};
+
 UCLASS()
 class ZSHOOT_API AZombie : public ACharacter
 {
@@ -48,6 +57,16 @@ private:
 	UCharacterMovementComponent* CharacterMovement;
 
 	APlayerActor* PlayerActor;
+
+	USkeletalMeshComponent* BodyMesh;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	EZombieAnimation CurrentAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	TMap<EZombieAnimation, UAnimSequence*> Animations;
+	bool PlayingAnimation = false;
+	
 
 	// ---------------------------------- State Properties ----------------------------------
 	

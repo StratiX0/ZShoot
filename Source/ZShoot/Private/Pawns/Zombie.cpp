@@ -99,6 +99,7 @@ void AZombie::UpdateState()
 void AZombie::HandleIdleState()
 {
 	CheckChasing();
+	CurrentAnimation = EZombieAnimation::Idle;
 	if (!IsWandering)
 	{
 		FTimerDelegate TimerDelegate;
@@ -121,6 +122,7 @@ void AZombie::HandleWanderState()
 	
 	if (AIController && !IsWandering)
 	{
+		CurrentAnimation = EZombieAnimation::Wander;
 		CharacterMovement->MaxWalkSpeed = WanderSpeed;
 		FVector WanderLocation = GetRandomPointInNavigableRadius();
 		IsWandering = true;
@@ -162,6 +164,7 @@ void AZombie::HandleChaseState()
 	}
 	else if (AIController)
 	{
+		CurrentAnimation = EZombieAnimation::Chase;
 		CharacterMovement->MaxWalkSpeed = ChasingSpeed;
 		FAIRequestID RequestID = AIController->MoveToActor(PlayerActor->GetController(), 200.f, true, true, true);
 		AIController->ReceiveMoveCompleted.AddDynamic(this, &AZombie::OnChasingCompleted);
