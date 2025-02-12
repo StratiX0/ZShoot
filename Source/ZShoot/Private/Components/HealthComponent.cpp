@@ -58,7 +58,7 @@ void UHealthComponent::Die()
         {
             if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
             {
-                GameInstance->RestartLevel();
+                GameInstance->EndGame();
                 return;
             }
         }

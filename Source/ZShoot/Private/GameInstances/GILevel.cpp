@@ -1,6 +1,7 @@
 #include "GameInstances/GILevel.h"
 #include "Widgets/PlayerHUDWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "HighScoreSaveGame.h"
 #include "Pawns/PlayerActor.h"
 
 void UGILevel::CreatePlayerHUD()
@@ -89,6 +90,7 @@ void UGILevel::OnEnemyDeath()
 
 	if (PlayerHUD)
 	{
+		KillCount++;
 		PlayerHUD->IncreaseKillCount(1);
 	}
 
@@ -108,4 +110,27 @@ void UGILevel::NextWave()
 void UGILevel::LogWaveStatus(const FString& Message)
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Message);
+}
+
+void UGILevel::EndGame()
+{
+	UE_LOG(LogTemp, Log, TEXT("Current Kill Count: %d"), KillCount);
+
+	int HighScore = UHighScoreSaveGame::LoadHighScore();
+
+	if (KillCount > HighScore)
+	{
+		UHighScoreSaveGame::SaveHighScore(KillCount);
+		UE_LOG(LogTemp, Log, TEXT("New High Score: %d"), KillCount);
+		HighScore = KillCount;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("High Score: %d"), HighScore);
+}
+
+void UGILevel::Debug_SaveHighScore(int32 TestKillCount)
+{
+	KillCount = TestKillCount;  // Simule un score atteint
+
+	EndGame();
 }

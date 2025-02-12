@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
+#include "HighScoreSaveGame.h"
 #include "GMLevel.generated.h"
 
 /**
@@ -16,6 +17,13 @@ class ZSHOOT_API AGMLevel : public AGameMode
 
 public:
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable, Category = "HighScore")
+	void SaveHighScore(int NewHighScore);
+
+	// Fonction pour charger le high score
+	UFUNCTION(BlueprintCallable, Category = "HighScore")
+	int LoadHighScore();
 
 private:
 	void InitializeGame();

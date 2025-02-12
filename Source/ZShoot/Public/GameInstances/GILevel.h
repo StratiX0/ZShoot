@@ -7,6 +7,8 @@
 #include "GILevel.generated.h"
 
 class UPlayerHUDWidget;
+class UHighScoreSaveGame;
+
 /**
  * 
  */
@@ -20,6 +22,13 @@ public:
 	void StartWave();
 	void RestartLevel();
 	void OnEnemyDeath();
+
+	UFUNCTION(BlueprintCallable, Category = "HighScore")
+	void EndGame();
+
+	UFUNCTION(Exec) // Permet d'exécuter la fonction via la console in-game
+	void Debug_SaveHighScore(int32 TestKillCount);
+
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "HUD Properties")
@@ -49,6 +58,7 @@ private:
 	int SpawnedEnemies = 0;
 	int CurrentWave = 1;
 	int EnemiesAlive = 0;
+	int KillCount = 0;
 
 	void SpawnEnemy();
 	void NextWave();
