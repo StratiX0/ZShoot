@@ -31,7 +31,9 @@ void AZombie::BeginPlay()
 
 	CharacterMovement->MaxWalkSpeed = WanderSpeed;
 
-	CurrentState = EZombieState::Idle;
+	SetState(EZombieState::Idle);
+
+	BodyMesh = GetMesh();
 
 	UpdateState();
 }
@@ -43,12 +45,6 @@ void AZombie::Tick(float DeltaTime)
 
 	InChasingRange();
 	UpdateState();
-}
-
-// Called to bind functionality to input
-void AZombie::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 // Override TakeDamage function
@@ -71,6 +67,15 @@ float AZombie::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 void AZombie::SetState(EZombieState NewState)
 {
 	CurrentState = NewState;
+}
+
+void AZombie::ChangeAnimation()
+{
+	if (CurrentAnimation != LastAnimation)
+	{
+		LastAnimation = CurrentAnimation;
+		BodyMesh->PlayAnimation(Animations[CurrentAnimation], true);
+	}
 }
 
 // Update the current state
@@ -99,7 +104,10 @@ void AZombie::UpdateState()
 void AZombie::HandleIdleState()
 {
 	CheckChasing();
+	
 	CurrentAnimation = EZombieAnimation::Idle;
+	ChangeAnimation();
+	
 	if (!IsWandering)
 	{
 		FTimerDelegate TimerDelegate;
@@ -119,10 +127,13 @@ void AZombie::HandleWanderState()
 {
 	SetState(EZombieState::Wander);
 	CheckChasing();
-	
+
 	if (AIController && !IsWandering)
 	{
 		CurrentAnimation = EZombieAnimation::Wander;
+
+		ChangeAnimation();
+
 		CharacterMovement->MaxWalkSpeed = WanderSpeed;
 		FVector WanderLocation = GetRandomPointInNavigableRadius();
 		IsWandering = true;
@@ -165,8 +176,11 @@ void AZombie::HandleChaseState()
 	else if (AIController)
 	{
 		CurrentAnimation = EZombieAnimation::Chase;
+
+		ChangeAnimation();
+
 		CharacterMovement->MaxWalkSpeed = ChasingSpeed;
-		FAIRequestID RequestID = AIController->MoveToActor(PlayerActor->GetController(), 200.f, true, true, true);
+		FAIRequestID RequestID = AIController->MoveToActor(PlayerActor->GetController(), AttackRange / 2.f, true, true, true);
 		AIController->ReceiveMoveCompleted.AddDynamic(this, &AZombie::OnChasingCompleted);
 	}
 }

@@ -40,10 +40,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	void SetState(EZombieState NewState);
 
 protected:
 	// Called when the game starts or when spawned
@@ -59,13 +58,20 @@ private:
 	APlayerActor* PlayerActor;
 
 	USkeletalMeshComponent* BodyMesh;
+
+	// ---------------------------------- Animation Properties ----------------------------------
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	EZombieAnimation CurrentAnimation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	EZombieAnimation LastAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	TMap<EZombieAnimation, UAnimSequence*> Animations;
 	bool PlayingAnimation = false;
+
+	void ChangeAnimation();
 	
 
 	// ---------------------------------- State Properties ----------------------------------
@@ -74,7 +80,6 @@ private:
 	EZombieState CurrentState;
 
 	FTimerHandle StateTimerHandler;
-	void SetState(EZombieState NewState);
 	
 	void UpdateState();
 	void HandleIdleState();
@@ -111,4 +116,8 @@ private:
 
 	bool InChasingRange();
 	void CheckChasing();
+
+	// Attack Properties
+	UPROPERTY(EditAnywhere, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
+	float AttackRange = 100.f;
 };
