@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,7 +5,6 @@
 #include "InputActionValue.h"
 #include "Components/Ammo.h"
 #include "PlayerActor.generated.h"
-
 
 class UPlayerHUDWidget;
 class UBoxComponent;
@@ -19,8 +16,9 @@ class UNiagaraSystem;
 class USoundCue;
 class UHealthComponent;
 class UAmmo;
+
 /**
- * 
+ * APlayerActor - Main player character class for handling input, movement, camera switching, combat, etc.
  */
 UCLASS()
 class ZSHOOT_API APlayerActor : public APawn
@@ -33,115 +31,136 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// HUD Properties
-	UPROPERTY(EditAnywhere, Category="HUD Properties")
+	UPROPERTY(EditAnywhere, Category = "HUD")
 	UPlayerHUDWidget* PlayerHUD;
 
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	// Component Properties
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UHealthComponent* HealthComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Ammo")
 	UAmmo* AmmoComponent;
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category= "Input")
+	// Input Action Properties
+	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* PlayerContext;
 
-	UPROPERTY(EditAnywhere, Category= "Input")
+	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* MovementAction;
-	
-	UPROPERTY(EditAnywhere, Category= "Input")
+
+	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, Category= "Input")
+	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* SwitchCameraSideAction;
-	
-	UPROPERTY(EditAnywhere, Category= "Input")
+
+	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* FireAction;
 
-	UPROPERTY(EditAnywhere, Category= "Input")
+	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* ReloadAction;
 
+	// Movement and Combat Functions
 	void Move(const FInputActionValue& Value);
 	void LookAround(const FInputActionValue& Value);
-	
 	void SwitchCameraSide(const FInputActionValue& Value);
-	void AllowCameraSwitch() { CanSwitchCameraSide = true; }
-	void AllowShoot() { CanShoot = true; }
-
 	void Fire(const FInputActionValue& Value);
-	FHitResult FireRaycast();
-
 	void Reload(const FInputActionValue& Value);
 
-private:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Feedback")
+	void PlayCameraShake();
 
-	// Model Components
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+private:
+	// Model Components (Removed BlueprintReadOnly and kept private)
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UBoxComponent* BoxComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* WheelMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* BodyMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* TurretMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USceneComponent* ShootingPoint;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USpringArmComponent* SpringArmComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UCameraComponent* CameraComp;
 
 	// Movement Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Movement")
 	float Speed = 400.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Movement")
 	float InterpSpeed = 2.f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
-	APlayerController* PlayerController;
 
 	// Camera Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CamSens = 1.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraOffsetY = 100.f;
-	
-	UPROPERTY(EditAnywhere, Category="Camera")
-	float CameraSwitchTime = 1.f;
-	
-	bool CanSwitchCameraSide = true;
-	bool CameraIsOnRightSide = true;
-	FTimerHandle CameraSwitchTimerHandler;
 
-	// Shooting Properties
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraSwitchTime = 1.f;
+
+	// Combat Properties
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	float Damage = 10.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	float FireRate = 500.f;
 
+	// Cooldown Flags
+	bool CanSwitchCameraSide = true;
+	bool CameraIsOnRightSide = true;
 	bool CanShoot = true;
+
+	FTimerHandle CameraSwitchTimerHandler;
 	FTimerHandle ShootTimerHandler;
 
-	UPROPERTY(EditAnywhere, Category = "Combat Properties")
-	USoundCue* FireSFX;
-
-	// VFX Properties
-	UPROPERTY(EditAnywhere, Category="VFX Properties")
+	// VFX & Audio Properties
+	UPROPERTY(EditAnywhere, Category = "VFX")
 	UNiagaraSystem* MuzzleFlashVFX;
 
-	UPROPERTY(EditAnywhere, Category="Shoot Properties")
+	UPROPERTY(EditAnywhere, Category = "VFX")
 	UNiagaraSystem* BloodSplashVFX;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundCue* FireSFX;
+
+	UPROPERTY(EditAnywhere, Category = "Feedback")
+	TSubclassOf<AActor> PinActor;
+
+	UPROPERTY(EditAnywhere, Category = "Feedback")
+	float PinVelocity = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Feedback")
+	float PinTimer = 0.5f;
+
+	// Internal Helper Functions
+	void BindInputAction(UEnhancedInputComponent* InputComponent, UInputAction* Action, void (APlayerActor::*ActionFunc)(const FInputActionValue&));
+	void RotateWheels(const FVector& DeltaLocation);
+	void StartShootCooldown();
+	void PlayFireEffects();
+	void SpawnBloodSplashEffect(const FHitResult& HitResult);
+	void ApplyDamageToActor(const FHitResult& HitResult);
+	void AllowCameraSwitch() { CanSwitchCameraSide = true; }
+	void AllowShoot() { CanShoot = true; }
+	void SpawnPins();
+
+	// Raycast for shooting
+	FHitResult FireRaycast();
+
+	UPROPERTY()
+	APlayerController* PlayerController;
 };

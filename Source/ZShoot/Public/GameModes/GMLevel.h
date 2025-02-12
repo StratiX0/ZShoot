@@ -15,12 +15,8 @@ class ZSHOOT_API AGMLevel : public AGameMode
 	GENERATED_BODY()
 
 public:
-
-	
-protected:
 	virtual void BeginPlay() override;
-	
-private:
 
-	
+private:
+	void InitializeGame();
 };

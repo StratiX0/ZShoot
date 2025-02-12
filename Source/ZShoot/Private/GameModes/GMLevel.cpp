@@ -7,8 +7,21 @@
 void AGMLevel::BeginPlay()
 {
 	Super::BeginPlay();
+	InitializeGame();
+}
 
+void AGMLevel::InitializeGame()
+{
 	UGILevel* GameInstance = Cast<UGILevel>(GetGameInstance());
-	GameInstance->CreatePlayerHUD();
-	GameInstance->StartWave();
+	if (GameInstance)
+	{
+		GameInstance->CreatePlayerHUD();
+		GameInstance->StartWave();
+
+		UE_LOG(LogTemp, Log, TEXT("Game initialized successfully."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to cast to UGILevel. Check GameInstance settings."));
+	}
 }

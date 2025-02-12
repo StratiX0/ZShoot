@@ -1,27 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Ammo.generated.h"
 
-
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ZSHOOT_API UAmmo : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UAmmo();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+
 	void DisplayAmmo();
-	
 	bool EnoughAmmo(int AmmoNeeded);
 	void UseAmmo(int AmmoUsed);
-
 	void Reload();
 	void MakeReload();
 	int GetMaxAmmo() const { return MaxAmmo; }
@@ -34,6 +28,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	// Ammo properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo Properties", meta = (AllowPrivateAccess = "true"))
 	int MaxAmmo = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo Properties", meta = (AllowPrivateAccess = "true"))
@@ -43,14 +38,18 @@ private:
 	int CurrentAmmoInMag = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo Properties", meta = (AllowPrivateAccess = "true"))
-	int MagCapacity = 30.f;
-	
+	int MagCapacity = 30;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo Properties", meta = (AllowPrivateAccess = "true"))
 	float ReloadTime = 2.f;
-	
-	FTimerHandle ReloadTimerHandler;
 
+	// Reloading state
+	FTimerHandle ReloadTimerHandler;
 	float RemainingReloadTime = 0.f;
 	bool IsReloading = false;
-	
+
+	// Helper functions
+	void StartReload();
+	void FinishReload();
 };
+

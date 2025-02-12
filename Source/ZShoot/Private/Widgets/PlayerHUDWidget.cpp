@@ -1,9 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Widgets/PlayerHUDWidget.h"
-
-#include "Blueprint/WidgetTree.h"
 #include "Components/ProgressBar.h"
 #include "Components/CanvasPanel.h"
 #include "Components/TextBlock.h"
@@ -12,14 +7,8 @@
 void UPlayerHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	if (CanvasPanel)
-	{
-		WidgetTree->RootWidget = CanvasPanel;
-	}
-
-	HideWaveTimer();
-	HideReloadBar();
+	ToggleVisibility(WaveTimer, false);
+	ToggleVisibility(ReloadBar, false);
 }
 
 void UPlayerHUDWidget::SetHealthValue(float Value)
@@ -27,128 +16,82 @@ void UPlayerHUDWidget::SetHealthValue(float Value)
 	if (HealthBar)
 	{
 		HealthBar->SetPercent(Value);
-		
-		FLinearColor HealthColor;
-		if (Value <= 0.25f)
-		{
-			HealthColor = FLinearColor::Red;
-		}
-		else
-		{
-			HealthColor = FLinearColor::LerpUsingHSV(FLinearColor::Red, FLinearColor::Green, Value);
-		}
+		FLinearColor HealthColor = (Value <= 0.25f) 
+			? FLinearColor::Red 
+			: FLinearColor::LerpUsingHSV(FLinearColor::Red, FLinearColor::Green, Value);
 		HealthBar->SetFillColorAndOpacity(HealthColor);
 	}
-
-	if (HealthText)
-	{
-		HealthText->SetText(FText::FromString(FString::Printf(TEXT("%d"), FMath::RoundToInt(Value * 100))));
-	}
-	
+	SetTextSafe(HealthText, FString::Printf(TEXT("%d"), FMath::RoundToInt(Value * 100)));
 }
 
 void UPlayerHUDWidget::SetAmmoValue(int CurrentAmmo, int MaxAmmo)
 {
-	if (AmmoText1 && AmmoText2)
-	{
-		AmmoText1->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
-		AmmoText2->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
-	}
+	SetTextSafe(AmmoText1, FString::Printf(TEXT("%d"), CurrentAmmo));
+	SetTextSafe(AmmoText2, FString::Printf(TEXT("%d"), MaxAmmo));
 }
 
 void UPlayerHUDWidget::UpdateReloadBar(float Value)
 {
-	if (ReloadBar)
-	{
-		ReloadBar->SetPercent(Value);
-	}
+	if (ReloadBar) ReloadBar->SetPercent(Value);
 }
 
-void UPlayerHUDWidget::ShowReloadBar()
-{
-	if (ReloadBar)
-	{
-		ReloadBar->SetVisibility(ESlateVisibility::Visible);
-	}
-}
+void UPlayerHUDWidget::ShowReloadBar() { ToggleVisibility(ReloadBar, true); }
+void UPlayerHUDWidget::HideReloadBar() { ToggleVisibility(ReloadBar, false); }
 
 void UPlayerHUDWidget::ShowHitMarker()
 {
-	FLinearColor HitMarkerColor = FLinearColor(1.f, 1.f, 1.f, 1.f);
-	HitMarker->SetColorAndOpacity(HitMarkerColor);
-
-	GetWorld()->GetTimerManager().SetTimer(HitMarkerTimerHandler, this, &UPlayerHUDWidget::FadeHitMarker, HitMarkerFadeTime, true);
+	if (HitMarker)
+	{
+		HitMarker->SetColorAndOpacity(FLinearColor::White);
+		GetWorld()->GetTimerManager().SetTimer(HitMarkerTimerHandle, this, &UPlayerHUDWidget::FadeHitMarker, HitMarkerFadeTime, true);
+	}
 }
 
 void UPlayerHUDWidget::FadeHitMarker()
 {
-	FLinearColor CurrentColor = HitMarker->GetColorAndOpacity();
-	float TargetAlpha = 0.f;
+	if (!HitMarker) return;
 
-	CurrentColor.A = FMath::FInterpTo(CurrentColor.A, TargetAlpha, GetWorld()->GetDeltaSeconds(), HitMarkerFadeSpeed);
+	FLinearColor CurrentColor = HitMarker->GetColorAndOpacity();
+	CurrentColor.A = FMath::FInterpTo(CurrentColor.A, 0.f, GetWorld()->GetDeltaSeconds(), HitMarkerFadeSpeed);
 	HitMarker->SetColorAndOpacity(CurrentColor);
 
 	if (CurrentColor.A <= 0.01f)
 	{
-		HitMarkerTimerHandler.Invalidate();
-		CurrentColor.A = 0.f;
-		HitMarker->SetColorAndOpacity(CurrentColor);
+		GetWorld()->GetTimerManager().ClearTimer(HitMarkerTimerHandle);
+		HitMarker->SetColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 0.f));
 	}
 }
 
 void UPlayerHUDWidget::StartWaveTimer(float Time)
 {
-	if (WaveTimer)
-	{
-		WaveTimer->SetText(FText::FromString(TEXT("Wave Start!")));
+	RemainingTime = Time;
+	SetTextSafe(WaveTimer, TEXT("Wave Start!"));
+	ToggleVisibility(WaveTimer, true);
 
-		WaveTimer->SetVisibility(ESlateVisibility::Visible);
-
-		GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &UPlayerHUDWidget::UpdateWaveTimer, 1.0f, true);
-
-		RemainingTime = Time;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("WaveTimer is null!"));
-	}
+	GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &UPlayerHUDWidget::UpdateWaveTimer, 1.0f, true);
 }
 
 void UPlayerHUDWidget::UpdateWaveTimer()
 {
-	int RoundedTime = FMath::CeilToInt(RemainingTime);
-	WaveTimer->SetText(FText::AsNumber(RoundedTime));
-	
 	if (RemainingTime <= 0)
 	{
-		WaveTimer->SetText(FText::FromString(TEXT("GO!")));
-		
+		SetTextSafe(WaveTimer, TEXT("GO!"));
 		GetWorld()->GetTimerManager().ClearTimer(WaveTimerHandle);
-		
 		GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &UPlayerHUDWidget::HideWaveTimer, 1.0f, false);
 	}
-
-	RemainingTime -= 1.0f;
-}
-
-void UPlayerHUDWidget::HideWaveTimer()
-{
-	WaveTimer->SetVisibility(ESlateVisibility::Hidden);
-}
-
-void UPlayerHUDWidget::HideReloadBar()
-{
-	ReloadBar->SetVisibility(ESlateVisibility::Hidden);
-}
-
-void UPlayerHUDWidget::IncreaseKillCount(int kill)
-{
-	KillCount += kill;
-
-	if (KillsNumberText)
+	else
 	{
-		KillsNumberText->SetText(FText::FromString(FString::Printf(TEXT("%d"), KillCount)));
+		SetTextSafe(WaveTimer, FString::FromInt(FMath::CeilToInt(RemainingTime)));
+		RemainingTime -= 1.0f;
 	}
+}
+
+void UPlayerHUDWidget::HideWaveTimer() { ToggleVisibility(WaveTimer, false); }
+
+void UPlayerHUDWidget::IncreaseKillCount(int Kill)
+{
+	KillCount += Kill;
+	SetTextSafe(KillsNumberText, FString::Printf(TEXT("%d"), KillCount));
 }
 
 void UPlayerHUDWidget::StartTimer()
@@ -159,10 +102,18 @@ void UPlayerHUDWidget::StartTimer()
 void UPlayerHUDWidget::UpdateTimer()
 {
 	GameTimer++;
-	int Minutes = GameTimer / 60;
-	int Seconds = GameTimer % 60;
-
-	TimerText->SetText(FText::FromString(FString::Printf(TEXT("%d'%02d"), Minutes, Seconds)));
+	SetTextSafe(TimerText, FString::Printf(TEXT("%d'%02d"), GameTimer / 60, GameTimer % 60));
 }
 
+// --- Helper Functions ---
 
+void UPlayerHUDWidget::SetTextSafe(UTextBlock* TextBlock, const FString& Text)
+{
+	if (TextBlock) TextBlock->SetText(FText::FromString(Text));
+}
+
+void UPlayerHUDWidget::ToggleVisibility(UWidget* Widget, bool bVisible)
+{
+	if (Widget)
+		Widget->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
