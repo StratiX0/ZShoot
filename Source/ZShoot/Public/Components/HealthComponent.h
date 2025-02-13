@@ -11,8 +11,7 @@ class ZSHOOT_API UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
+public:
 	UHealthComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -22,17 +21,19 @@ public:
 	void DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* Instigator, AActor* DamageCauser);
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
-private:	
+private:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	float MaxHealth = 100.f;
-	UPROPERTY(EditAnywhere, Category = "Components")
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	float CurrentHealth = 0.f;
 
 	// Functions to process damage and death
 	
 	void Die();
-	void DestroyOwner();	
+	void DestroyOwner();
+	void UpdateHealthUI();
+	void HandleEnemyDeath(AActor* EnemyActor);
 };

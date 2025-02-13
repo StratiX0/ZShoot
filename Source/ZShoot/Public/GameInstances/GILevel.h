@@ -7,6 +7,8 @@
 #include "GILevel.generated.h"
 
 class UPlayerHUDWidget;
+class UHighScoreSaveGame;
+
 /**
  * 
  */
@@ -21,34 +23,46 @@ public:
 	void RestartLevel();
 	void OnEnemyDeath();
 
-	FTimerHandle SpawnTimerHandle;
-	FTimerHandle WaveTimerHandle;
+	UFUNCTION(BlueprintCallable, Category = "HighScore")
+	void EndGame();
+
+	UFUNCTION(Exec) // Permet d'exécuter la fonction via la console in-game
+	void Debug_SaveHighScore(int32 TestKillCount);
+
 
 protected:
-
-private:
 	UPROPERTY(EditAnywhere, Category = "HUD Properties")
 	TSubclassOf<UPlayerHUDWidget> PlayerHUDClass;
-	UPROPERTY(EditAnywhere, Category = "HUD Properties")
-	UPlayerHUDWidget* PlayerHUD;
 
 	UPROPERTY(EditAnywhere, Category = "Wave Settings")
 	TSubclassOf<AActor> EnemyClass;
+
 	UPROPERTY(EditAnywhere, Category = "Wave Settings")
 	int InitialEnemy = 5;
+
 	UPROPERTY(EditAnywhere, Category = "Wave Settings")
 	float GrowthRate = 0.3f;
 
 	UPROPERTY(EditAnywhere, Category = "Wave Settings")
 	float SpawnTime = 1.0f;
+
 	UPROPERTY(EditAnywhere, Category = "Wave Settings")
 	float WaveTime = 5.0f;
+
+private:
+	UPlayerHUDWidget* PlayerHUD = nullptr;
+	FTimerHandle SpawnTimerHandle;
+	FTimerHandle WaveTimerHandle;
 
 	int EnemiesToSpawn = 0;
 	int SpawnedEnemies = 0;
 	int CurrentWave = 1;
 	int EnemiesAlive = 0;
+	int KillCount = 0;
+
 	void SpawnEnemy();
 	void NextWave();
 	void StartEnemySpawn();
+	void LinkHUDToPlayer();
+	void LogWaveStatus(const FString& Message);
 };

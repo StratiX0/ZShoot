@@ -1,32 +1,23 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "PowerUp/PowerUpAmmo.h"
-
 #include "Components/Ammo.h"
 #include "Pawns/PlayerActor.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
+// Constructor to set default values
 APowerUpAmmo::APowerUpAmmo()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Enable ticking every frame
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Initialize components
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
 
 	RingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ring Mesh"));
 	RingMesh->SetupAttachment(Mesh);
 
-	// Configure collision settings
-	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	Mesh->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	Mesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-
-	RingMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	RingMesh->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	RingMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	// Initialize collision settings
+	InitializeCollision();
 }
 
 // Called when the game starts or when spawned
@@ -34,8 +25,10 @@ void APowerUpAmmo::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Bind the hit event to the OnHit function
 	Mesh->OnComponentHit.AddDynamic(this, &APowerUpAmmo::OnHit);
 
+	// Randomize the ammo amount within a specified range
 	AmmoAmount = FMath::RandRange(10, 50);
 }
 
@@ -44,26 +37,39 @@ void APowerUpAmmo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Rotate the actor
+	// Rotate the mesh with constant speed
 	FRotator Rotation = FRotator(0.f, RotationSpeed * UGameplayStatics::GetWorldDeltaSeconds(this), 0.f);
 	Mesh->AddLocalRotation(Rotation);
 
-	FVector NewLocation = FVector::ZeroVector;
+	// Create a sine wave-based bounce effect
 	float DeltaHeight = FMath::Sin(UGameplayStatics::GetTimeSeconds(this) * AnimationSpeed) * AnimationHeight;
-	NewLocation.Z += DeltaHeight;
-	Mesh->AddRelativeLocation(NewLocation);
+	Mesh->AddRelativeLocation(FVector(0.f, 0.f, DeltaHeight));
 }
 
-void APowerUpAmmo::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
- FVector NormalImpulse, const FHitResult& Hit)
+// Collision handler when the power-up hits something
+void APowerUpAmmo::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (APlayerActor* Player = Cast<APlayerActor>(OtherActor))
 	{
+		// If the player's ammo isn't full, add the power-up's ammo
 		if (!Player->AmmoComponent->IsFull())
 		{
 			Player->AmmoComponent->AddAmmo(AmmoAmount);
-			Destroy();
+			Destroy();  // Destroy the power-up after it's picked up
 		}
 	}
 }
 
+// Helper function to initialize the collision settings for meshes
+void APowerUpAmmo::InitializeCollision()
+{
+	// Configure the mesh's collision
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Mesh->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	Mesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+
+	// Configure the ring mesh's collision similarly
+	RingMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	RingMesh->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	RingMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+}

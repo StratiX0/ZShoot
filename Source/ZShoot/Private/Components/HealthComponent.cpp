@@ -2,7 +2,6 @@
 
 
 #include "Components/HealthComponent.h"
-
 #include "GameInstances/GILevel.h"
 #include "Kismet/GameplayStatics.h"
 #include "Pawns/AIZombie.h"
@@ -10,96 +9,96 @@
 #include "Pawns/Zombie.h"
 #include "Widgets/PlayerHUDWidget.h"
 
-// Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.bCanEverTick = true;
 }
 
-
-// Called when the game starts
 void UHealthComponent::BeginPlay()
 {
-	Super::BeginPlay();
-
-	CurrentHealth = MaxHealth;
-	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
+    Super::BeginPlay();
+    CurrentHealth = MaxHealth;
+    if (AActor* Owner = GetOwner())
+    {
+        Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
+    }
 }
 
-// Called every frame
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
 void UHealthComponent::Heal(float HealAmount)
 {
-	if (HealAmount <= 0.f) return;
+    if (HealAmount <= 0.f || CurrentHealth == MaxHealth) return;
 
-	CurrentHealth = FMath::Clamp(CurrentHealth + HealAmount, 0.f, MaxHealth);
-	
-	APlayerActor* PlayerActor = Cast<APlayerActor>(GetOwner());
-	if (PlayerActor)
-	{
-		PlayerActor->PlayerHUD->SetHealthValue(CurrentHealth / MaxHealth);
-	}
+    CurrentHealth = FMath::Clamp(CurrentHealth + HealAmount, 0.f, MaxHealth);
+    UpdateHealthUI();
 }
 
 void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* Instigator, AActor* DamageCauser)
 {
-	if (Damage <= 0.f) return;
+    if (Damage <= 0.f || CurrentHealth <= 0.f) return;
 
-	CurrentHealth -= Damage;
+    CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
+    UpdateHealthUI();
 
-	if (CurrentHealth <= 0)
-	{
-		CurrentHealth = 0;
-		Die();
-	}
-
-	APlayerActor* PlayerActor = Cast<APlayerActor>(GetOwner());
-	if (PlayerActor)
-	{
-		PlayerActor->PlayerHUD->SetHealthValue(CurrentHealth / MaxHealth);
-	}
+    if (CurrentHealth <= 0.f)
+    {
+        Die();
+    }
 }
 
 void UHealthComponent::Die()
 {
-	if (APlayerActor* PlayerActor = Cast<APlayerActor>(GetOwner()))
-	{
-		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
-		{
-			GameInstance->RestartLevel();
-			return;
-		}
-	}
+    if (AActor* Owner = GetOwner())
+    {
+        if (APlayerActor* PlayerActor = Cast<APlayerActor>(Owner))
+        {
+            if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
+            {
+                GameInstance->EndGame();
+                return;
+            }
+        }
+        else if (AAIZombie* AIZombieEnemy = Cast<AAIZombie>(Owner))
+        {
+            HandleEnemyDeath(AIZombieEnemy);
+        }
+        else if (AZombie* ZombieEnemy = Cast<AZombie>(Owner))
+        {
+            HandleEnemyDeath(ZombieEnemy);
+        }
 
-	if (AAIZombie* EnemyActor = Cast<AAIZombie>(GetOwner()))
-	{
-		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
-		{
-			GameInstance->OnEnemyDeath();
-		}
-	}
+        GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UHealthComponent::DestroyOwner);
+    }
+}
 
-	if (AZombie* EnemyActor = Cast<AZombie>(GetOwner()))
-	{
-		if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
-		{
-			GameInstance->OnEnemyDeath();
-		}
-	}
-	
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UHealthComponent::DestroyOwner);
+void UHealthComponent::HandleEnemyDeath(AActor* EnemyActor)
+{
+    if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
+    {
+        GameInstance->OnEnemyDeath();
+    }
 }
 
 void UHealthComponent::DestroyOwner()
 {
-	if (AActor* Owner = GetOwner())
-	{
-		Owner->Destroy();
-	}
+    if (AActor* Owner = GetOwner())
+    {
+        Owner->Destroy();
+    }
+}
+
+void UHealthComponent::UpdateHealthUI()
+{
+    if (APlayerActor* PlayerActor = Cast<APlayerActor>(GetOwner()))
+    {
+        if (PlayerActor->PlayerHUD)
+        {
+            PlayerActor->PlayerHUD->SetHealthValue(CurrentHealth / MaxHealth);
+        }
+    }
 }
 
