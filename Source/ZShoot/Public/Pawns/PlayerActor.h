@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Components/Ammo.h"
 #include "PlayerActor.generated.h"
@@ -23,7 +23,7 @@ class UAmmo;
  * 
  */
 UCLASS()
-class ZSHOOT_API APlayerActor : public APawn
+class ZSHOOT_API APlayerActor : public ACharacter
 {
 	GENERATED_BODY()
 
