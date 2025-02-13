@@ -99,6 +99,11 @@ void UPlayerHUDWidget::StartTimer()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UPlayerHUDWidget::UpdateTimer, 1.0f, true);
 }
 
+int UPlayerHUDWidget::GetTimer() const
+{
+	return GameTimer;
+}
+
 void UPlayerHUDWidget::UpdateTimer()
 {
 	GameTimer++;

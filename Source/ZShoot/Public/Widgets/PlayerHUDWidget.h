@@ -24,6 +24,7 @@ public:
 	void HideReloadBar();
 	void StartWaveTimer(float Time);
 	void StartTimer();
+	int GetTimer() const;
 	void IncreaseKillCount(int Kill);
 
 protected:
@@ -77,6 +78,6 @@ private:
 	void UpdateWaveTimer();
 	void HideWaveTimer();
 	void UpdateTimer();
-	void SetTextSafe(UTextBlock* TextBlock, const FString& Text);
-	void ToggleVisibility(UWidget* Widget, bool bVisible);
+	static void SetTextSafe(UTextBlock* TextBlock, const FString& Text);
+	static void ToggleVisibility(UWidget* Widget, bool bVisible);
 };
