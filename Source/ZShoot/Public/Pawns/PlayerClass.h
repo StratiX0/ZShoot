@@ -41,6 +41,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Ammo")
 	UAmmo* AmmoComponent;
 
+	UFUNCTION(BlueprintCallable)
+	UAmmo* GetAmmoComponent() const { return AmmoComponent; }
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -124,6 +127,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "VFX")
 	UNiagaraSystem* BloodSplashVFX;
+
+	UPROPERTY(EditAnywhere, Category = "VFX")
+	UNiagaraSystem* BulletTracerVFX;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundCue* FireSFX;

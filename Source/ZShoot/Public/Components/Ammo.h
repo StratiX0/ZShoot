@@ -20,6 +20,7 @@ public:
 	void MakeReload();
 	int GetMaxAmmo() const { return MaxAmmo; }
 	int GetCurrentAmmo() const { return CurrentAmmo; }
+	UFUNCTION(BlueprintCallable)
 	bool GetIsReloading() const { return IsReloading; }
 	void AddAmmo(int AmmoToAdd);
 	bool IsFull() const { return CurrentAmmo == MaxAmmo; }

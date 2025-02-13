@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Pawns/Zombie.h"
 #include "Sound/SoundCue.h"
 #include "Widgets/PlayerHUDWidget.h"
@@ -95,17 +96,16 @@ void APlayerClass::BindInputAction(UEnhancedInputComponent* LocalInputComponent,
 void APlayerClass::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
-	if (PlayerController)
+	if (PlayerController && CharacterMovement)
 	{
-		FRotator SpringArmRotation = SpringArmComp->GetRelativeRotation();
-		SpringArmRotation.Pitch = 0.f;
+		// Normalize the movement vector
+		FVector MovementDirection = FVector(MovementVector.Y, MovementVector.X, 0.f).GetSafeNormal();
 
-		FVector ForwardDirection = FRotationMatrix(SpringArmRotation).GetUnitAxis(EAxis::X);
-		FVector RightDirection = FRotationMatrix(SpringArmRotation).GetUnitAxis(EAxis::Y);
-		FVector DeltaLocation = (ForwardDirection * MovementVector.Y + RightDirection * MovementVector.X) * Speed * GetWorld()->GetDeltaSeconds();
-		DeltaLocation.Z = 0.f;
+		// Calculate the force to apply
+		FVector Force = MovementDirection * Speed * UGameplayStatics::GetWorldDeltaSeconds(this);	
 
-		AddActorLocalOffset(DeltaLocation, true);
+		AddMovementInput(GetActorForwardVector() * Force.X);
+		AddMovementInput(GetActorRightVector() * Force.Y);
 	}
 }
 
@@ -117,8 +117,11 @@ void APlayerClass::LookAround(const FInputActionValue& Value)
 	{
 		FRotator SpringArmRotator = SpringArmComp->GetRelativeRotation();
 		SpringArmRotator.Yaw += RotationVector.X * CamSens * GetWorld()->GetDeltaSeconds();
-		SpringArmRotator.Pitch = FMath::Clamp(SpringArmRotator.Pitch + RotationVector.Y * CamSens * GetWorld()->GetDeltaSeconds(), -89.9f, 89.9f);
-		SpringArmComp->SetWorldRotation(SpringArmRotator);
+		SpringArmRotator.Pitch = FMath::Clamp(SpringArmRotator.Pitch + RotationVector.Y * CamSens * UGameplayStatics::GetWorldDeltaSeconds(this), -89.9f, 89.9f);
+		FRotator CameraRotator = SpringArmComp->GetRelativeRotation();
+		CameraRotator.Pitch = SpringArmRotator.Pitch;
+		AddControllerYawInput(SpringArmRotator.Yaw);
+		SpringArmComp->SetRelativeRotation(CameraRotator);
 	}
 }
 
@@ -186,6 +189,11 @@ void APlayerClass::PlayFireEffects()
 	if (FireSFX)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSFX, GetActorLocation());
+	}
+
+	if (BulletTracerVFX)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BulletTracerVFX, ShootingPoint->GetComponentLocation(), ShootingPoint->GetComponentRotation());
 	}
 
 	SpawnPins();
