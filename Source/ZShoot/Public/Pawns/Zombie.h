@@ -14,8 +14,8 @@ UENUM(BlueprintType)
 enum class EZombieState : uint8
 {
 	Idle UMETA(DisplayName = "Idle"),
+	Walking UMETA(DisplayName = "Walk"),
 	Chase UMETA(DisplayName = "Chase"),
-	Wander UMETA(DisplayName = "Wander"),
 	Attack UMETA(DisplayName = "Attack")
 };
 
@@ -23,8 +23,8 @@ UENUM(BlueprintType)
 enum class EZombieAnimation : uint8
 {
 	Idle UMETA(DisplayName = "Idle Animation"),
+	Walking UMETA(DisplayName = "Walk Animation"),
 	Chase UMETA(DisplayName = "Chase Animation"),
-	Wander UMETA(DisplayName = "Wander Animation"),
 	Attack UMETA(DisplayName = "Attack Animation")
 };
 
@@ -84,22 +84,18 @@ private:
 	void UpdateState();
 	void HandleIdleState();
 
-	// Wander Properties
+	// Walking Properties
 	
-	void HandleWanderState();
+	void HandleWalkingState();
 	
 	UFUNCTION()
 	void OnWanderCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 	FNavLocation GetRandomPointInNavigableRadius();
-	bool IsWaitingToWander = false;
-	bool IsWandering = false;
+	bool IsWaitingToWalk = false;
+	bool IsWalking = false;
 
 	UPROPERTY(EditAnywhere, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
-	float WanderSpeed = 200.f;
-	
-	// Attack Properties
-	
-	void HandleAttackState();
+	float WalkingSpeed = 200.f;
 	
 	// Chasing Properties
 
@@ -114,10 +110,21 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
 	float ChasingSpeed = 400.f;
 
-	bool InChasingRange();
-	void CheckChasing();
+	void CheckChasingRange();
+	bool CheckInAttackRange();
 
 	// Attack Properties
-	UPROPERTY(EditAnywhere, Category = "Movement Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Attack Properties", meta = (AllowPrivateAccess = "true"))
 	float AttackRange = 100.f;
+
+	UPROPERTY(EditAnywhere, Category = "Attack Properties", meta = (AllowPrivateAccess = "true"))
+	float AttackDamage = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Attack Properties", meta = (AllowPrivateAccess = "true"))
+	float AttackInterval = 2.f;
+
+	FTimerHandle AttackTimerHandler;
+	bool CanAttack = true;
+
+	void HandleAttackState();
 };
