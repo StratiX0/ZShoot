@@ -114,7 +114,16 @@ void UGILevel::LogWaveStatus(const FString& Message)
 
 void UGILevel::EndGame()
 {
+<<<<<<< Updated upstream
 	UE_LOG(LogTemp, Log, TEXT("Current Kill Count: %d"), KillCount);
+=======
+    PlayerHUD->StopTimer();
+    
+    // Récupération du high score
+    const int HighScore = UHighScoreSaveGame::LoadHighScore();
+    const int CurrentTimer = PlayerHUD->GetTimer();
+    bool bIsNewHighScore = KillCount > HighScore;
+>>>>>>> Stashed changes
 
 	int HighScore = UHighScoreSaveGame::LoadHighScore();
 

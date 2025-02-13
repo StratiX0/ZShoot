@@ -24,6 +24,11 @@ public:
 	void HideReloadBar();
 	void StartWaveTimer(float Time);
 	void StartTimer();
+<<<<<<< Updated upstream
+=======
+	void StopTimer();
+	int GetTimer() const;
+>>>>>>> Stashed changes
 	void IncreaseKillCount(int Kill);
 
 protected:
