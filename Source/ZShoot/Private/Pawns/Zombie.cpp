@@ -2,7 +2,7 @@
 
 #include "NavigationSystem.h"
 #include "Components/HealthComponent.h"
-#include "Pawns/PlayerActor.h"
+#include "Pawns/PlayerClass.h"
 #include "Kismet/GameplayStatics.h"
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "TimerManager.h"
@@ -23,7 +23,7 @@ void AZombie::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerActor = Cast<APlayerActor>(UGameplayStatics::GetPlayerPawn(this, 0));
+	PlayerActor = Cast<APlayerClass>(UGameplayStatics::GetPlayerPawn(this, 0));
 
 	AIController = Cast<AAIController>(GetController());
 

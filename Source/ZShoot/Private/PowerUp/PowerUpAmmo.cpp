@@ -1,7 +1,7 @@
 #include "PowerUp/PowerUpAmmo.h"
 #include "Components/Ammo.h"
-#include "Pawns/PlayerActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Pawns/PlayerClass.h"
 
 // Constructor to set default values
 APowerUpAmmo::APowerUpAmmo()
@@ -49,7 +49,7 @@ void APowerUpAmmo::Tick(float DeltaTime)
 // Collision handler when the power-up hits something
 void APowerUpAmmo::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (APlayerActor* Player = Cast<APlayerActor>(OtherActor))
+	if (APlayerClass* Player = Cast<APlayerClass>(OtherActor))
 	{
 		// If the player's ammo isn't full, add the power-up's ammo
 		if (!Player->AmmoComponent->IsFull())

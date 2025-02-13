@@ -2,8 +2,8 @@
 
 #include "PowerUp/PowerUpHeal.h"
 #include "Kismet/GameplayStatics.h"
-#include "Pawns/PlayerActor.h"
 #include "Components/HealthComponent.h"
+#include "Pawns/PlayerClass.h"
 
 // Sets default values
 APowerUpHeal::APowerUpHeal()
@@ -58,7 +58,7 @@ void APowerUpHeal::SetStartHealAmount()
 void APowerUpHeal::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                          FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (APlayerActor* Player = Cast<APlayerActor>(OtherActor))
+	if (APlayerClass* Player = Cast<APlayerClass>(OtherActor))
 	{
 		// Heal the player if not at full health
 		if (!Player->HealthComponent->IsFullHealth())

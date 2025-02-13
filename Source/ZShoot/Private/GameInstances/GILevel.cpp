@@ -2,7 +2,7 @@
 #include "Widgets/PlayerHUDWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "HighScoreSaveGame.h"
-#include "Pawns/PlayerActor.h"
+#include "Pawns/PlayerClass.h"
 
 void UGILevel::CreatePlayerHUD()
 {
@@ -30,7 +30,7 @@ void UGILevel::CreatePlayerHUD()
 void UGILevel::LinkHUDToPlayer()
 {
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-	APlayerActor* PlayerActor = Cast<APlayerActor>(PlayerController->GetPawn());
+	APlayerClass* PlayerActor = Cast<APlayerClass>(PlayerController->GetPawn());
 	if (PlayerActor && PlayerHUD)
 	{
 		PlayerActor->PlayerHUD = PlayerHUD;
@@ -78,7 +78,7 @@ void UGILevel::SpawnEnemy()
 		return;
 	}
 
-	FVector SpawnLocation(FMath::RandRange(1000.f, 2000.f), FMath::RandRange(-1500.f, -500.f), 60.f);
+	FVector SpawnLocation(FMath::RandRange(1000.f, 2000.f), FMath::RandRange(-1500.f, -500.f), 150.f);
 	GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, FRotator::ZeroRotator);
 	SpawnedEnemies++;
 }

@@ -7,7 +7,7 @@
 
 class AAIController;
 class UHealthComponent;
-class APlayerActor;
+class APlayerClass;
 class UPathFollowingComponent;
 
 UENUM(BlueprintType)
@@ -55,7 +55,7 @@ private:
 	AAIController* AIController;
 	UCharacterMovementComponent* CharacterMovement;
 
-	APlayerActor* PlayerActor;
+	APlayerClass* PlayerActor;
 
 	USkeletalMeshComponent* BodyMesh;
 
