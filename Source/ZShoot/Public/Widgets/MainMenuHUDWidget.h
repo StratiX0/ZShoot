@@ -18,6 +18,9 @@ protected:
 	TObjectPtr<UButton> StartButton;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI")
+	TObjectPtr<UButton> OptionsButton;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "UI")
 	TObjectPtr<UButton> QuitButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
@@ -28,6 +31,9 @@ protected:
 
 	UFUNCTION()
 	void OnQuitClicked();
+
+	UFUNCTION()
+	void OnOptionsClicked();
 
 	virtual void NativeConstruct() override;
 };
