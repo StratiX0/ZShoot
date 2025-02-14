@@ -25,6 +25,8 @@ public:
 	APowerUpHeal();
 	virtual void Tick(float DeltaTime) override;
 
+	void SetRandomHealType();
+
 protected:
 	virtual void BeginPlay() override;
 

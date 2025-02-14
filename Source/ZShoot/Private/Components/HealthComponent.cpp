@@ -64,6 +64,7 @@ void UHealthComponent::Die()
         else if (AZombie* ZombieEnemy = Cast<AZombie>(Owner))
         {
             HandleEnemyDeath(ZombieEnemy);
+            ZombieEnemy->SpawnPowerUp();
         }
 
         GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UHealthComponent::DestroyOwner);

@@ -3,6 +3,7 @@
 #include "NavigationSystem.h"
 #include "Components/HealthComponent.h"
 #include "Pawns/PlayerClass.h"
+#include "PowerUp/PowerUpHeal.h"
 #include "Kismet/GameplayStatics.h"
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "TimerManager.h"
@@ -67,6 +68,39 @@ void AZombie::SetState(EZombieState NewState)
 {
 	CurrentState = NewState;
 }
+
+void AZombie::SpawnPowerUp()
+{
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	float RandomValue = FMath::RandRange(0.f, 1.f);
+	TSubclassOf<AActor> SelectedPowerUpClass = nullptr;
+
+	if (RandomValue <= AmmoSpawnChance && PowerUpAmmoClass)
+	{
+		SelectedPowerUpClass = PowerUpAmmoClass;
+	}
+	else if (RandomValue <= (AmmoSpawnChance + HealSpawnChance) && PowerUpHealClass)
+	{
+		SelectedPowerUpClass = PowerUpHealClass;
+
+		APowerUpHeal* SpawnedHeal = World->SpawnActor<APowerUpHeal>(SelectedPowerUpClass, GetActorLocation() + FVector(0.f, 0.f, 50.f), FRotator::ZeroRotator);
+		if (SpawnedHeal)
+		{
+			SpawnedHeal->SetRandomHealType();  // Randomly select a heal type
+		}
+	}
+
+	if (SelectedPowerUpClass)
+	{
+		FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 50.f);
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+
+		World->SpawnActor<AActor>(SelectedPowerUpClass, SpawnLocation, SpawnRotation);
+	}
+}
+
 
 void AZombie::ChangeAnimation()
 {

@@ -44,6 +44,8 @@ public:
 
 	void SetState(EZombieState NewState);
 
+	void SpawnPowerUp();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -58,6 +60,18 @@ private:
 	APlayerClass* PlayerActor;
 
 	USkeletalMeshComponent* BodyMesh;
+
+	UPROPERTY(EditAnywhere, Category = "PowerUp Spawn")
+	TSubclassOf<AActor> PowerUpAmmoClass;
+
+	UPROPERTY(EditAnywhere, Category = "PowerUp Spawn")
+	TSubclassOf<AActor> PowerUpHealClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PowerUp Spawn", meta = (AllowPrivateAccess = "true", ClampMin = "0.0", ClampMax = "1.0"))
+	float AmmoSpawnChance = 0.4f; // Par défaut 40%
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PowerUp Spawn", meta = (AllowPrivateAccess = "true", ClampMin = "0.0", ClampMax = "1.0"))
+	float HealSpawnChance = 0.05f; // Par défaut 5%
 
 	// ---------------------------------- Animation Properties ----------------------------------
 	

@@ -109,3 +109,13 @@ void APowerUpHeal::Tick(float DeltaTime)
 	Mesh->SetRelativeLocation(NewLocation);
 }
 
+void APowerUpHeal::SetRandomHealType()
+{
+	TArray<EPUHealType> HealTypes = { EPUHealType::Option1, EPUHealType::Option2, EPUHealType::Option3 };
+	int32 RandomIndex = FMath::RandRange(0, HealTypes.Num() - 1);
+	HealType = HealTypes[RandomIndex];
+
+	SetStartHealAmount();
+}
+
+
