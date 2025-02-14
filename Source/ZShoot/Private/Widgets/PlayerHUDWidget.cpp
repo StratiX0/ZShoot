@@ -65,7 +65,7 @@ void UPlayerHUDWidget::FadeHitMarker()
 void UPlayerHUDWidget::StartWaveTimer(float Time)
 {
 	RemainingTime = Time;
-	SetTextSafe(WaveTimer, TEXT("Wave Start!"));
+	SetTextSafe(WaveTimer, TEXT("New Wave Beginning!"));
 	ToggleVisibility(WaveTimer, true);
 
 	GetWorld()->GetTimerManager().SetTimer(WaveTimerHandle, this, &UPlayerHUDWidget::UpdateWaveTimer, 1.0f, true);
@@ -92,6 +92,12 @@ void UPlayerHUDWidget::IncreaseKillCount(int Kill)
 {
 	KillCount += Kill;
 	SetTextSafe(KillsNumberText, FString::Printf(TEXT("%d"), KillCount));
+}
+
+void UPlayerHUDWidget::SetWave(int WaveNumber)
+{
+	Wave = WaveNumber;
+	SetTextSafe(WaveText, FString::Printf(TEXT("%d"), Wave));
 }
 
 void UPlayerHUDWidget::StartTimer()

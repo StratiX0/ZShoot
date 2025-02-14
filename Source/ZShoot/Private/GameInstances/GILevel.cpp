@@ -3,6 +3,7 @@
 #include "Widgets/GameOverHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "HighScoreSaveGame.h"
+#include "Engine/TargetPoint.h"
 #include "Pawns/PlayerClass.h"
 
 void UGILevel::CreatePlayerHUD()
@@ -63,6 +64,17 @@ void UGILevel::StartEnemySpawn()
 
 void UGILevel::SpawnEnemy()
 {
+    TArray<AActor*> FoundActors;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), FoundActors);
+    SpawnPoints.Empty();
+    for (AActor* Actor : FoundActors)
+    {
+        if (ATargetPoint* TargetPoint = Cast<ATargetPoint>(Actor))
+        {
+            SpawnPoints.Add(TargetPoint);
+        }
+    }
+    
     if (SpawnedEnemies >= EnemiesToSpawn)
     {
         GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
@@ -76,11 +88,18 @@ void UGILevel::SpawnEnemy()
         return;
     }
 
-    const FVector SpawnLocation(FMath::RandRange(3400.f, 9500.f), FMath::RandRange(-2600.f, 7200.f), 150.f);
-
-    if (AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, FRotator::ZeroRotator))
+    if (SpawnPoints.Num() > 0)
     {
-        SpawnedEnemies++;
+        ATargetPoint* RandomSpawnPoint = SpawnPoints[FMath::RandRange(0, SpawnPoints.Num() - 1)];
+
+        FBox Radius = FBox(500.f * FVector(-1, -1, 0), 500.f * FVector(1, 1, 0));
+
+        FVector SpawnLocation = RandomSpawnPoint->GetActorLocation() + FMath::RandPointInBox(Radius);
+
+        if (AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, FRotator::ZeroRotator))
+        {
+            SpawnedEnemies++;
+        }
     }
 }
 
@@ -104,6 +123,12 @@ void UGILevel::OnEnemyDeath()
 void UGILevel::NextWave()
 {
     CurrentWave++;
+    APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+    APlayerClass* PlayerActor = Cast<APlayerClass>(PlayerController->GetPawn());
+    if (PlayerActor && PlayerHUD)
+    {
+        PlayerActor->PlayerHUD->SetWave(CurrentWave);
+    }
     StartWave();
     LogWaveStatus(FString::Printf(TEXT("Wave %d completed. Preparing next wave..."), CurrentWave - 1));
 }

@@ -27,6 +27,7 @@ public:
 	void StopTimer();
 	int GetTimer() const;
 	void IncreaseKillCount(int Kill);
+	void SetWave(int WaveNumber);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -61,6 +62,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Kills", meta = (BindWidget))
 	TObjectPtr<UTextBlock> KillsNumberText;
 
+	UPROPERTY(BlueprintReadOnly, Category = "HUD", meta = (BindWidget))
+	TObjectPtr<UTextBlock> WaveText;
+
 private:
 	// Timers
 	FTimerHandle HitMarkerTimerHandle;
@@ -73,6 +77,7 @@ private:
 	float RemainingTime;
 	int KillCount = 0;
 	int GameTimer = 0;
+	int Wave = 0;
 
 	// Helper Functions
 	void FadeHitMarker();

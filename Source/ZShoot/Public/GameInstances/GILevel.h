@@ -18,7 +18,7 @@ class ZSHOOT_API UGILevel : public UGameInstance
 {
 	GENERATED_BODY()
 
-public:
+public:	
 	// Initializes Player HUD and Game Over HUD
 	void CreatePlayerHUD();
 
@@ -80,6 +80,9 @@ private:
 	int CurrentWave = 1;
 	int EnemiesAlive = 0;
 	int KillCount = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Spawn Settings")
+	TArray<ATargetPoint*> SpawnPoints;
 
 	// Private helper functions
 	void SpawnEnemy();

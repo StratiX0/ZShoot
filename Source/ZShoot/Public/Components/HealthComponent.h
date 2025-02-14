@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
+class UNiagaraSystem;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ZSHOOT_API UHealthComponent : public UActorComponent
 {
@@ -30,10 +32,20 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	float CurrentHealth = 0.f;
 
+	UPROPERTY(EditAnywhere, Category = "Components")
+	float RandomMultiplierMin;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
+	float RandomMultiplierMax;
+
+	UPROPERTY(EditAnywhere, Category = "VFX")
+	UNiagaraSystem* PlayerBloodSplashVFX;
+
 	// Functions to process damage and death
 	
 	void Die();
 	void DestroyOwner();
 	void UpdateHealthUI();
 	void HandleEnemyDeath(AActor* EnemyActor);
+	void PlayPLayerBloodSplash();
 };

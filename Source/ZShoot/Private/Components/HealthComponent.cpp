@@ -2,6 +2,8 @@
 
 
 #include "Components/HealthComponent.h"
+
+#include "NiagaraFunctionLibrary.h"
 #include "GameInstances/GILevel.h"
 #include "Kismet/GameplayStatics.h"
 #include "Pawns/PlayerClass.h"
@@ -16,7 +18,15 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
+
+    if (AZombie* Owner = Cast<AZombie>(GetOwner()))
+    {
+        float RandomMultiplier = FMath::RandRange(RandomMultiplierMin, RandomMultiplierMax);
+        MaxHealth *= RandomMultiplier;
+    }
+    
     CurrentHealth = MaxHealth;
+    
     if (AActor* Owner = GetOwner())
     {
         Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
@@ -42,6 +52,7 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 
     CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
     UpdateHealthUI();
+    PlayPLayerBloodSplash();
 
     if (CurrentHealth <= 0.f)
     {
@@ -76,6 +87,17 @@ void UHealthComponent::HandleEnemyDeath(AActor* EnemyActor)
     if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
     {
         GameInstance->OnEnemyDeath();
+    }
+}
+
+void UHealthComponent::PlayPLayerBloodSplash()
+{
+    if (AActor* Owner = GetOwner())
+    {
+        if (APlayerClass* PlayerActor = Cast<APlayerClass>(Owner))
+        {
+            UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PlayerBloodSplashVFX, PlayerActor->GetActorLocation());
+        }
     }
 }
 
