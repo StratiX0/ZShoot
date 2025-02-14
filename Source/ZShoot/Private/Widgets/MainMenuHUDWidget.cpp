@@ -21,6 +21,11 @@ void UMainMenuHUDWidget::OnStartClicked()
 {
 	if (!LevelToLoad.IsNone())
 	{
+		if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))
+		{
+			PlayerController->bShowMouseCursor = false;
+			PlayerController->SetInputMode(FInputModeGameOnly());
+		}
 		UGameplayStatics::OpenLevel(this, LevelToLoad);
 	}
 	else
