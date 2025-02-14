@@ -47,6 +47,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UAmmo* GetAmmoComponent() const { return AmmoComponent; }
+
+	UPROPERTY(BlueprintReadWrite, Category = "Components")
+	UStaticMeshComponent* RifleMesh;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -161,7 +164,7 @@ private:
 	void InitializePlayerController();
 	void BindInputAction(UEnhancedInputComponent* InputComponent, UInputAction* Action, void (APlayerClass::*ActionFunc)(const FInputActionValue&));
 	void StartShootCooldown();
-	void PlayFireEffects();
+	void PlayFireEffects(FHitResult* OutHit);
 	void SpawnBloodSplashEffect(const FHitResult& HitResult);
 	void ApplyDamageToActor(const FHitResult& HitResult);
 	void AllowCameraSwitch() { CanSwitchCameraSide = true; }

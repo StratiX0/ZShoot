@@ -31,8 +31,11 @@ APlayerClass::APlayerClass()
 	CameraComp->SetupAttachment(SpringArmComp);
 	CameraComp->bUsePawnControlRotation = false;
 
+	RifleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Rifle"));
+	RifleMesh->SetupAttachment(RootComponent);
+
 	ShootingPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
-	ShootingPoint->SetupAttachment(RootComponent);
+	ShootingPoint->SetupAttachment(RifleMesh);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 	AmmoComponent = CreateDefaultSubobject<UAmmo>(TEXT("Ammo Component"));
@@ -145,10 +148,11 @@ void APlayerClass::Fire(const FInputActionValue& Value)
 	{
 		FHitResult OutHit = FireRaycast();
 
-		PlayFireEffects();
+		PlayFireEffects(&OutHit);
 
 		if (OutHit.GetActor())
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *OutHit.GetActor()->GetName()));
 			ApplyDamageToActor(OutHit);
 		}
 
@@ -193,29 +197,28 @@ FHitResult APlayerClass::FireRaycast()
 }
 
 // Play muzzle flash and sound
-void APlayerClass::PlayFireEffects()
-{
+void APlayerClass::PlayFireEffects(FHitResult* OutHit)
+{        
+	FVector Start = ShootingPoint->GetComponentLocation();
+	FVector End = OutHit->ImpactPoint;
+
+	FVector Direction = End - Start;
+	Direction.Normalize();
+
+	FRotator TracerRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
 	if (MuzzleFlashVFX)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MuzzleFlashVFX, ShootingPoint->GetComponentLocation(), ShootingPoint->GetComponentRotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MuzzleFlashVFX, Start, TracerRotation);
 	}
 
 	if (FireSFX)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSFX, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, FireSFX, Start);
 	}
 
 	if (BulletTracerVFX)
 	{
-		FHitResult OutHit = FireRaycast();
-        
-		FVector Start = ShootingPoint->GetComponentLocation();
-		FVector End = OutHit.ImpactPoint;
 
-		FVector Direction = End - Start;
-		Direction.Normalize();
-
-		FRotator TracerRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
 
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BulletTracerVFX, Start, TracerRotation);
 	}
