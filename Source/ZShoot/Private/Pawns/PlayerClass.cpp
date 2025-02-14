@@ -82,6 +82,7 @@ void APlayerClass::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		BindInputAction(EnhancedInputComponent, SwitchCameraSideAction, &APlayerClass::SwitchCameraSide);
 		BindInputAction(EnhancedInputComponent, FireAction, &APlayerClass::Fire);
 		BindInputAction(EnhancedInputComponent, ReloadAction, &APlayerClass::Reload);
+		BindInputAction(EnhancedInputComponent, AimAction, &APlayerClass::Aim);
 	}
 }
 
@@ -90,6 +91,7 @@ void APlayerClass::BindInputAction(UEnhancedInputComponent* LocalInputComponent,
 	if (Action)
 	{
 		LocalInputComponent->BindAction(Action, ETriggerEvent::Triggered, this, ActionFunc);
+		LocalInputComponent->BindAction(Action, ETriggerEvent::Completed, this, ActionFunc);
 	}
 }
 
@@ -153,6 +155,19 @@ void APlayerClass::Fire(const FInputActionValue& Value)
 		AmmoComponent->UseAmmo(1);
 		StartShootCooldown();
 	}
+}
+
+// Reload the ammo
+void APlayerClass::Reload(const FInputActionValue& Value)
+{
+	AmmoComponent->MakeReload();
+}
+
+void APlayerClass::Aim(const FInputActionValue& Value)
+{
+	bool bIsAiming = Value.Get<bool>();
+	float TargetFOV = bIsAiming ? CameraAimFOV : CameraDefaultFOV;
+	CameraComp->SetFieldOfView(TargetFOV);
 }
 
 void APlayerClass::StartShootCooldown()
@@ -280,11 +295,5 @@ void APlayerClass::SpawnBloodSplashEffect(const FHitResult& HitResult)
 	Params.Scale = FVector::OneVector;
 
 	UNiagaraFunctionLibrary::SpawnSystemAtLocationWithParams(Params);
-}
-
-// Reload the ammo
-void APlayerClass::Reload(const FInputActionValue& Value)
-{
-	AmmoComponent->MakeReload();
 }
 

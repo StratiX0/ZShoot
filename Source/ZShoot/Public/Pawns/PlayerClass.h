@@ -35,6 +35,10 @@ public:
 	UPlayerHUDWidget* PlayerHUD;
 
 	// Component Properties
+
+	UFUNCTION(BlueprintCallable)
+	USpringArmComponent* GetSpringArmComponent() const { return SpringArmComp; }
+	
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UHealthComponent* HealthComponent;
 
@@ -66,12 +70,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* ReloadAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* AimAction;
+
 	// Movement and Combat Functions
 	void Move(const FInputActionValue& Value);
 	void LookAround(const FInputActionValue& Value);
 	void SwitchCameraSide(const FInputActionValue& Value);
 	void Fire(const FInputActionValue& Value);
 	void Reload(const FInputActionValue& Value);
+	void Aim(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Feedback")
 	void PlayCameraShake();
@@ -105,6 +113,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraSwitchTime = 1.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraDefaultFOV = 90.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraAimFOV = 60.f;
 
 	// Combat Properties
 	UPROPERTY(EditAnywhere, Category = "Combat")
