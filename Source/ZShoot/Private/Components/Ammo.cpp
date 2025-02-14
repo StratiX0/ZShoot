@@ -1,5 +1,5 @@
 #include "Components/Ammo.h"
-#include "Pawns/PlayerActor.h"
+#include "Pawns/PlayerClass.h"
 #include "Widgets/PlayerHUDWidget.h"
 
 UAmmo::UAmmo()
@@ -24,7 +24,7 @@ void UAmmo::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentT
 	if (IsReloading)
 	{
 		RemainingReloadTime -= DeltaTime;
-		if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+		if (APlayerClass* Player = Cast<APlayerClass>(GetOwner()))
 		{
 			float ReloadProgress = FMath::Clamp((ReloadTime - RemainingReloadTime) / ReloadTime, 0.f, 1.f);
 			Player->PlayerHUD->UpdateReloadBar(ReloadProgress);
@@ -34,7 +34,7 @@ void UAmmo::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentT
 
 void UAmmo::DisplayAmmo()
 {
-	if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+	if (APlayerClass* Player = Cast<APlayerClass>(GetOwner()))
 	{
 		Player->PlayerHUD->SetAmmoValue(CurrentAmmoInMag, CurrentAmmo);
 	}
@@ -77,7 +77,7 @@ void UAmmo::Reload()
 	}
 
 	// Hide reload bar
-	if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+	if (APlayerClass* Player = Cast<APlayerClass>(GetOwner()))
 	{
 		Player->PlayerHUD->HideReloadBar();
 	}
@@ -103,7 +103,7 @@ void UAmmo::StartReload()
 	GetOwner()->GetWorldTimerManager().SetTimer(ReloadTimerHandler, this, &UAmmo::Reload, ReloadTime, false);
 
 	// Show reload bar
-	if (APlayerActor* Player = Cast<APlayerActor>(GetOwner()))
+	if (APlayerClass* Player = Cast<APlayerClass>(GetOwner()))
 	{
 		Player->PlayerHUD->ShowReloadBar();
 	}

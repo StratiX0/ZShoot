@@ -4,8 +4,7 @@
 #include "Components/HealthComponent.h"
 #include "GameInstances/GILevel.h"
 #include "Kismet/GameplayStatics.h"
-#include "Pawns/AIZombie.h"
-#include "Pawns/PlayerActor.h"
+#include "Pawns/PlayerClass.h"
 #include "Pawns/Zombie.h"
 #include "Widgets/PlayerHUDWidget.h"
 
@@ -54,17 +53,13 @@ void UHealthComponent::Die()
 {
     if (AActor* Owner = GetOwner())
     {
-        if (APlayerActor* PlayerActor = Cast<APlayerActor>(Owner))
+        if (APlayerClass* PlayerActor = Cast<APlayerClass>(Owner))
         {
             if (UGILevel* GameInstance = Cast<UGILevel>(UGameplayStatics::GetGameInstance(this)))
             {
                 GameInstance->EndGame();
                 return;
             }
-        }
-        else if (AAIZombie* AIZombieEnemy = Cast<AAIZombie>(Owner))
-        {
-            HandleEnemyDeath(AIZombieEnemy);
         }
         else if (AZombie* ZombieEnemy = Cast<AZombie>(Owner))
         {
@@ -93,7 +88,7 @@ void UHealthComponent::DestroyOwner()
 
 void UHealthComponent::UpdateHealthUI()
 {
-    if (APlayerActor* PlayerActor = Cast<APlayerActor>(GetOwner()))
+    if (APlayerClass* PlayerActor = Cast<APlayerClass>(GetOwner()))
     {
         if (PlayerActor->PlayerHUD)
         {

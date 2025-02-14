@@ -3,7 +3,7 @@
 #include "Widgets/GameOverHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "HighScoreSaveGame.h"
-#include "Pawns/PlayerActor.h"
+#include "Pawns/PlayerClass.h"
 
 void UGILevel::CreatePlayerHUD()
 {
@@ -30,13 +30,12 @@ void UGILevel::CreatePlayerHUD()
 
 void UGILevel::LinkHUDToPlayer() const
 {
-    if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))
-    {
-        if (APlayerActor* PlayerActor = Cast<APlayerActor>(PlayerController->GetPawn()))
-        {
-            PlayerActor->PlayerHUD = PlayerHUD;
-        }
-    }
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	APlayerClass* PlayerActor = Cast<APlayerClass>(PlayerController->GetPawn());
+	if (PlayerActor && PlayerHUD)
+	{
+		PlayerActor->PlayerHUD = PlayerHUD;
+	}
 }
 
 void UGILevel::RestartLevel() const
@@ -77,7 +76,7 @@ void UGILevel::SpawnEnemy()
         return;
     }
 
-    const FVector SpawnLocation(FMath::RandRange(1000.f, 2000.f), FMath::RandRange(-1500.f, -500.f), 90.f);
+    const FVector SpawnLocation(FMath::RandRange(1000.f, 2000.f), FMath::RandRange(-1500.f, -500.f), 150.f);
 
     if (AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, FRotator::ZeroRotator))
     {

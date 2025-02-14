@@ -2,7 +2,7 @@
 
 #include "NavigationSystem.h"
 #include "Components/HealthComponent.h"
-#include "Pawns/PlayerActor.h"
+#include "Pawns/PlayerClass.h"
 #include "Kismet/GameplayStatics.h"
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "TimerManager.h"
@@ -23,13 +23,13 @@ void AZombie::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerActor = Cast<APlayerActor>(UGameplayStatics::GetPlayerPawn(this, 0));
+	PlayerActor = Cast<APlayerClass>(UGameplayStatics::GetPlayerPawn(this, 0));
 
 	AIController = Cast<AAIController>(GetController());
 
 	CharacterMovement = GetCharacterMovement();
 
-	CharacterMovement->MaxWalkSpeed = WanderSpeed;
+	CharacterMovement->MaxWalkSpeed = WalkingSpeed;
 
 	SetState(EZombieState::Idle);
 
@@ -43,7 +43,6 @@ void AZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	InChasingRange();
 	UpdateState();
 }
 
@@ -81,17 +80,21 @@ void AZombie::ChangeAnimation()
 // Update the current state
 void AZombie::UpdateState()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Current State: %s"), *UEnum::GetValueAsString(CurrentState)));
+	CheckChasingRange();
+	CheckInAttackRange();
 	switch (CurrentState)
 	{
 	case EZombieState::Idle:
 		HandleIdleState();
 		break;
+	case EZombieState::Walking:
+		HandleWalkingState();
+		break;
 	case EZombieState::Chase:
 		HandleChaseState();
 		break;
-	case EZombieState::Wander:
-		HandleWanderState();
+	case EZombieState::Attack:
+		HandleAttackState();
 		break;
 	default:
 		break;
@@ -103,17 +106,15 @@ void AZombie::UpdateState()
 // Manage the idle state
 void AZombie::HandleIdleState()
 {
-	CheckChasing();
-	
 	CurrentAnimation = EZombieAnimation::Idle;
 	ChangeAnimation();
 	
-	if (!IsWandering)
+	if (!IsWalking)
 	{
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindLambda([this]()
 		{
-			SetState(EZombieState::Wander);
+			SetState(EZombieState::Walking);
 		});
 		StateTimerHandler.Invalidate();
 		GetWorldTimerManager().SetTimer(StateTimerHandler, TimerDelegate, FMath::RandRange(1.f, 5.f), false);
@@ -123,20 +124,19 @@ void AZombie::HandleIdleState()
 // --------- Wander ---------
 
 // Manage the wander state
-void AZombie::HandleWanderState()
+void AZombie::HandleWalkingState()
 {
-	SetState(EZombieState::Wander);
-	CheckChasing();
+	SetState(EZombieState::Walking);
 
-	if (AIController && !IsWandering)
+	if (AIController && !IsWalking)
 	{
-		CurrentAnimation = EZombieAnimation::Wander;
+		CurrentAnimation = EZombieAnimation::Walking;
 
 		ChangeAnimation();
 
-		CharacterMovement->MaxWalkSpeed = WanderSpeed;
+		CharacterMovement->MaxWalkSpeed = WalkingSpeed;
 		FVector WanderLocation = GetRandomPointInNavigableRadius();
-		IsWandering = true;
+		IsWalking = true;
 		FAIRequestID RequestID = AIController->MoveToLocation(WanderLocation, -1, true, true, true, true, 0, true);
 		AIController->ReceiveMoveCompleted.AddDynamic(this, &AZombie::OnWanderCompleted);
 	}
@@ -147,7 +147,7 @@ void AZombie::OnWanderCompleted(FAIRequestID RequestID, EPathFollowingResult::Ty
 {
 	if (Result == EPathFollowingResult::Success)
 	{
-		IsWandering = false;
+		IsWalking = false;
 		SetState(EZombieState::Idle);
 	}
 }
@@ -169,11 +169,7 @@ FNavLocation AZombie::GetRandomPointInNavigableRadius()
 // Manage the chase state
 void AZombie::HandleChaseState()
 {
-	if (!InChasingRange())
-	{
-		SetState(EZombieState::Idle);
-	}
-	else if (AIController)
+	if (AIController)
 	{
 		CurrentAnimation = EZombieAnimation::Chase;
 
@@ -190,33 +186,51 @@ void AZombie::OnChasingCompleted(FAIRequestID RequestID, EPathFollowingResult::T
 {
 	if (Result == EPathFollowingResult::Success)
 	{
-		SetState(EZombieState::Idle);
+		SetState(EZombieState::Attack);
 	}
 }
 
 // Returns true if the player is in chasing range
-bool AZombie::InChasingRange()
+void AZombie::CheckChasingRange()
 {
 	float Distance = FVector::Dist(GetActorLocation(), PlayerActor->GetActorLocation());
 
 	if (Distance <= ChasingRange)
 	{
 		SetState(EZombieState::Chase);
-		return true;
-	}
-	return false;	
+	}	
 }
 
-// Change the State to Chase if the player is in chasing range
-void AZombie::CheckChasing()
+bool AZombie::CheckInAttackRange()
 {
-	if (InChasingRange())
+	float Distance = FVector::Dist(GetActorLocation(), PlayerActor->GetActorLocation());
+
+	if (Distance < AttackRange)
 	{
-		SetState(EZombieState::Chase);
+		SetState(EZombieState::Attack);
+		return true;
 	}
+	
+	return false;
 }
 
 void AZombie::HandleAttackState()
 {
-	SetState(EZombieState::Attack);
+	if (PlayerActor && CanAttack)
+	{
+		CurrentAnimation = EZombieAnimation::Attack;
+		ChangeAnimation();
+		
+		auto DamageTypeClass = UDamageType::StaticClass();		
+		UGameplayStatics::ApplyDamage(PlayerActor, AttackDamage, GetInstigatorController(), this, DamageTypeClass);
+		SetState(EZombieState::Idle);
+		CanAttack = false;
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindLambda([this]()
+		{
+			CanAttack = true;
+		});
+		AttackTimerHandler.Invalidate();
+		GetWorldTimerManager().SetTimer(AttackTimerHandler, TimerDelegate, AttackInterval, false);
+	}
 }

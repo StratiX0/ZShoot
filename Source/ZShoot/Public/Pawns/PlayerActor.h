@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "GameFramework/Pawn.h"
 #include "InputActionValue.h"
 #include "Components/Ammo.h"
 #include "PlayerActor.generated.h"
@@ -21,7 +21,7 @@ class UAmmo;
  * APlayerActor - Main player character class for handling input, movement, camera switching, combat, etc.
  */
 UCLASS()
-class ZSHOOT_API APlayerActor : public ACharacter
+class ZSHOOT_API APlayerActor : public APawn
 {
 	GENERATED_BODY()
 
