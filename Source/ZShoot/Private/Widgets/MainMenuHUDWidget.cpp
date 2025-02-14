@@ -1,5 +1,6 @@
 #include "Widgets/MainMenuHUDWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameModes/GM_MainMenu.h"
 #include "Engine/World.h"
 
 void UMainMenuHUDWidget::NativeConstruct()
@@ -14,6 +15,11 @@ void UMainMenuHUDWidget::NativeConstruct()
 	if (QuitButton)
 	{
 		QuitButton->OnClicked.AddDynamic(this, &UMainMenuHUDWidget::OnQuitClicked);
+	}
+
+	if (OptionsButton)
+	{
+		OptionsButton->OnClicked.AddDynamic(this, &UMainMenuHUDWidget::OnOptionsClicked);
 	}
 }
 
@@ -37,4 +43,14 @@ void UMainMenuHUDWidget::OnStartClicked()
 void UMainMenuHUDWidget::OnQuitClicked()
 {
 	FGenericPlatformMisc::RequestExit(false);
+}
+
+void UMainMenuHUDWidget::OnOptionsClicked()
+{
+	AGM_MainMenu* MainMenuGameMode = Cast<AGM_MainMenu>(UGameplayStatics::GetGameMode(this));
+
+	if (MainMenuGameMode)
+	{
+		MainMenuGameMode->ShowOptionsMenu();
+	}
 }

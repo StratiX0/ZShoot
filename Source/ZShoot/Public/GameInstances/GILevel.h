@@ -7,10 +7,12 @@
 class UPlayerHUDWidget;
 class UGameOverHUD;
 class UHighScoreSaveGame;
+class ATargetPoint;
 
 /**
  * The GameInstance class for managing game level logic, including player HUD, waves, enemies, and high score.
  */
+
 UCLASS()
 class ZSHOOT_API UGILevel : public UGameInstance
 {

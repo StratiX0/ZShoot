@@ -76,7 +76,7 @@ void UGILevel::SpawnEnemy()
         return;
     }
 
-    const FVector SpawnLocation(FMath::RandRange(1000.f, 2000.f), FMath::RandRange(-1500.f, -500.f), 150.f);
+    const FVector SpawnLocation(FMath::RandRange(3400.f, 9500.f), FMath::RandRange(-2600.f, 7200.f), 150.f);
 
     if (AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, SpawnLocation, FRotator::ZeroRotator))
     {
