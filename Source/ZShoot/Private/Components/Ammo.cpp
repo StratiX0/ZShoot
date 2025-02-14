@@ -11,7 +11,7 @@ void UAmmo::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentAmmo = MaxAmmo;
+	CurrentAmmo = DefaultAmmo;
 	CurrentAmmoInMag = MagCapacity;
 	DisplayAmmo();
 }

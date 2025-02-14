@@ -34,6 +34,8 @@ private:
 	int MaxAmmo = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo Properties", meta = (AllowPrivateAccess = "true"))
 	int CurrentAmmo = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo Properties", meta = (AllowPrivateAccess = "true"))
+	int DefaultAmmo = 90;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo Properties", meta = (AllowPrivateAccess = "true"))
 	int CurrentAmmoInMag = 0;

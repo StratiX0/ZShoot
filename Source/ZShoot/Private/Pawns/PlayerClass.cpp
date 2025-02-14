@@ -274,8 +274,6 @@ void APlayerClass::ApplyDamageToActor(const FHitResult& HitResult)
 {
 	auto DamageTypeClass = UDamageType::StaticClass();
 	UGameplayStatics::ApplyDamage(HitResult.GetActor(), Damage, GetInstigatorController(), this, DamageTypeClass);
-
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *HitResult.GetActor()->GetName()));
 	AZombie* Zombie = Cast<AZombie>(HitResult.GetActor());
 	if (PlayerHUD && Zombie)
 	{
