@@ -73,6 +73,7 @@ void AZombie::ChangeAnimation()
 	if (CurrentAnimation != LastAnimation)
 	{
 		LastAnimation = CurrentAnimation;
+		if (CurrentAnimation == EZombieAnimation::Attack) return;
 		BodyMesh->PlayAnimation(Animations[CurrentAnimation], true);
 	}
 }
@@ -106,6 +107,7 @@ void AZombie::UpdateState()
 // Manage the idle state
 void AZombie::HandleIdleState()
 {
+	if (!CanAttack) return;
 	CurrentAnimation = EZombieAnimation::Idle;
 	ChangeAnimation();
 	
@@ -195,7 +197,7 @@ void AZombie::CheckChasingRange()
 {
 	float Distance = FVector::Dist(GetActorLocation(), PlayerActor->GetActorLocation());
 
-	if (Distance <= ChasingRange)
+	if (Distance <= ChasingRange && CanAttack)
 	{
 		SetState(EZombieState::Chase);
 	}	
@@ -205,7 +207,7 @@ bool AZombie::CheckInAttackRange()
 {
 	float Distance = FVector::Dist(GetActorLocation(), PlayerActor->GetActorLocation());
 
-	if (Distance < AttackRange)
+	if (Distance <= AttackRange)
 	{
 		SetState(EZombieState::Attack);
 		return true;
@@ -216,21 +218,36 @@ bool AZombie::CheckInAttackRange()
 
 void AZombie::HandleAttackState()
 {
-	if (PlayerActor && CanAttack)
+	UAnimInstance* Animation = BodyMesh->GetAnimInstance();
+	if (PlayerActor && CanAttack && Animation)
 	{
 		CurrentAnimation = EZombieAnimation::Attack;
 		ChangeAnimation();
-		
-		auto DamageTypeClass = UDamageType::StaticClass();		
-		UGameplayStatics::ApplyDamage(PlayerActor, AttackDamage, GetInstigatorController(), this, DamageTypeClass);
-		SetState(EZombieState::Idle);
+		BodyMesh->PlayAnimation(Animations[CurrentAnimation], true);
+		UE_LOG(LogTemp, Warning, TEXT("Zombie Attack"));
 		CanAttack = false;
+		
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindLambda([this]()
 		{
-			CanAttack = true;
+			if (CheckInAttackRange())
+			{
+				auto DamageTypeClass = UDamageType::StaticClass();
+				UGameplayStatics::ApplyDamage(PlayerActor, AttackDamage, GetInstigatorController(), this, DamageTypeClass);
+			}
 		});
+		DamageTimerHandler.Invalidate();
+		GetWorldTimerManager().SetTimer(DamageTimerHandler, TimerDelegate, AttackInterval, false);
+
+		FTimerDelegate TimerDelegate2;
+		TimerDelegate2.BindLambda([this]()
+		{
+			CanAttack = true;
+			SetState(EZombieState::Idle);
+		});
+
+		float Duration = Animations[CurrentAnimation]->GetPlayLength();
 		AttackTimerHandler.Invalidate();
-		GetWorldTimerManager().SetTimer(AttackTimerHandler, TimerDelegate, AttackInterval, false);
+		GetWorldTimerManager().SetTimer(AttackTimerHandler, TimerDelegate2, Duration, false);
 	}
 }

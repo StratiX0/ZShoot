@@ -123,6 +123,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Attack Properties", meta = (AllowPrivateAccess = "true"))
 	float AttackInterval = 2.f;
 
+	FTimerHandle DamageTimerHandler;
 	FTimerHandle AttackTimerHandler;
 	bool CanAttack = true;
 
