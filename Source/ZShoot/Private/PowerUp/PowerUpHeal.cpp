@@ -27,6 +27,9 @@ void APowerUpHeal::BeginPlay()
 
 	// Set the initial heal amount and materials
 	SetStartHealAmount();
+	
+	// Store the initial height
+	InitialHeight = Mesh->GetRelativeLocation().Z;
 }
 
 void APowerUpHeal::SetStartHealAmount()
@@ -77,9 +80,32 @@ void APowerUpHeal::Tick(float DeltaTime)
 	FRotator Rotation = FRotator(0.f, RotationSpeed * UGameplayStatics::GetWorldDeltaSeconds(this), 0.f);
 	Mesh->AddLocalRotation(Rotation);
 
-	// Animate the mesh's height
-	FVector NewLocation = FVector::ZeroVector;
-	float DeltaHeight = FMath::Sin(UGameplayStatics::GetTimeSeconds(this) * AnimationSpeed) * AnimationHeight;
-	NewLocation.Z += DeltaHeight;
-	Mesh->AddRelativeLocation(NewLocation);
+	// Animate the mesh's height around its initial height
+	static bool bGoingUp = true;
+	static float CurrentHeightOffset = 0.0f;
+	float DeltaMove = DeltaTime * AnimationSpeed;
+
+	if (bGoingUp)
+	{
+		CurrentHeightOffset += DeltaMove;
+		if (CurrentHeightOffset >= AnimationHeight)
+		{
+			CurrentHeightOffset = AnimationHeight;
+			bGoingUp = false;
+		}
+	}
+	else
+	{
+		CurrentHeightOffset -= DeltaMove;
+		if (CurrentHeightOffset <= 0.0f)
+		{
+			CurrentHeightOffset = 0.0f;
+			bGoingUp = true;
+		}
+	}
+
+	FVector NewLocation = Mesh->GetRelativeLocation();
+	NewLocation.Z = InitialHeight + CurrentHeightOffset;
+	Mesh->SetRelativeLocation(NewLocation);
 }
+

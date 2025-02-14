@@ -51,4 +51,7 @@ private:
 
 	// Helper function to initialize collision
 	void InitializeCollision();
+
+	float InitialHeight;
+
 };

@@ -30,6 +30,9 @@ void APowerUpAmmo::BeginPlay()
 
 	// Randomize the ammo amount within a specified range
 	AmmoAmount = FMath::RandRange(10, 50);
+	
+	// Store the initial height
+	InitialHeight = Mesh->GetRelativeLocation().Z;
 }
 
 // Called every frame
@@ -37,13 +40,37 @@ void APowerUpAmmo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Rotate the mesh with constant speed
+	// Rotate the mesh component
 	FRotator Rotation = FRotator(0.f, RotationSpeed * UGameplayStatics::GetWorldDeltaSeconds(this), 0.f);
 	Mesh->AddLocalRotation(Rotation);
 
-	// Create a sine wave-based bounce effect
-	float DeltaHeight = FMath::Sin(UGameplayStatics::GetTimeSeconds(this) * AnimationSpeed) * AnimationHeight;
-	Mesh->AddRelativeLocation(FVector(0.f, 0.f, DeltaHeight));
+	// Animate the mesh's height around its initial height
+	static bool bGoingUp = true;
+	static float CurrentHeightOffset = 0.0f;
+	float DeltaMove = DeltaTime * AnimationSpeed;
+
+	if (bGoingUp)
+	{
+		CurrentHeightOffset += DeltaMove;
+		if (CurrentHeightOffset >= AnimationHeight)
+		{
+			CurrentHeightOffset = AnimationHeight;
+			bGoingUp = false;
+		}
+	}
+	else
+	{
+		CurrentHeightOffset -= DeltaMove;
+		if (CurrentHeightOffset <= 0.0f)
+		{
+			CurrentHeightOffset = 0.0f;
+			bGoingUp = true;
+		}
+	}
+
+	FVector NewLocation = Mesh->GetRelativeLocation();
+	NewLocation.Z = InitialHeight + CurrentHeightOffset;
+	Mesh->SetRelativeLocation(NewLocation);
 }
 
 // Collision handler when the power-up hits something
