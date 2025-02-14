@@ -16,7 +16,6 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
-    CurrentHealth = MaxHealth;
     if (AActor* Owner = GetOwner())
     {
         Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);

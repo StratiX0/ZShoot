@@ -16,8 +16,6 @@ APowerUpAmmo::APowerUpAmmo()
 	RingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ring Mesh"));
 	RingMesh->SetupAttachment(Mesh);
 
-	// Initialize collision settings
-	InitializeCollision();
 }
 
 // Called when the game starts or when spawned
@@ -26,7 +24,7 @@ void APowerUpAmmo::BeginPlay()
 	Super::BeginPlay();
 
 	// Bind the hit event to the OnHit function
-	Mesh->OnComponentHit.AddDynamic(this, &APowerUpAmmo::OnHit);
+	RingMesh->OnComponentBeginOverlap.AddDynamic(this, &APowerUpAmmo::OnOverlap);
 
 	// Randomize the ammo amount within a specified range
 	AmmoAmount = FMath::RandRange(10, 50);
@@ -74,29 +72,15 @@ void APowerUpAmmo::Tick(float DeltaTime)
 }
 
 // Collision handler when the power-up hits something
-void APowerUpAmmo::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void APowerUpAmmo::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (APlayerClass* Player = Cast<APlayerClass>(OtherActor))
 	{
-		// If the player's ammo isn't full, add the power-up's ammo
+		// Si les munitions du joueur ne sont pas pleines, ajouter les munitions du power-up
 		if (!Player->AmmoComponent->IsFull())
 		{
 			Player->AmmoComponent->AddAmmo(AmmoAmount);
-			Destroy();  // Destroy the power-up after it's picked up
+			Destroy();  // Détruire le power-up après qu'il soit ramassé
 		}
 	}
-}
-
-// Helper function to initialize the collision settings for meshes
-void APowerUpAmmo::InitializeCollision()
-{
-	// Configure the mesh's collision
-	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	Mesh->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	Mesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-
-	// Configure the ring mesh's collision similarly
-	RingMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	RingMesh->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	RingMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 }
