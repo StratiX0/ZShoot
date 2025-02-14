@@ -218,8 +218,6 @@ void APlayerClass::PlayFireEffects(FHitResult* OutHit)
 
 	if (BulletTracerVFX)
 	{
-
-
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BulletTracerVFX, Start, TracerRotation);
 	}
 

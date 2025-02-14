@@ -11,6 +11,13 @@ void UPlayerHUDWidget::NativeConstruct()
 	ToggleVisibility(ReloadBar, false);
 }
 
+void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	if (bUpdateBloodSplash)	UpdateBloodSplash(InDeltaTime);
+}
+
 void UPlayerHUDWidget::SetHealthValue(float Value)
 {
 	if (HealthBar)
@@ -98,6 +105,19 @@ void UPlayerHUDWidget::SetWave(int WaveNumber)
 {
 	Wave = WaveNumber;
 	SetTextSafe(WaveText, FString::Printf(TEXT("%d"), Wave));
+}
+
+void UPlayerHUDWidget::UpdateBloodSplash(float DeltaTime)
+{
+	FLinearColor EndColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
+	if (BloodSplashIMG)
+	{
+		FLinearColor CurrentColor = BloodSplashIMG->ColorAndOpacity;
+		FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.75f);
+		FLinearColor NewColor = FMath::CInterpTo(CurrentColor, EndColor, DeltaTime, BloodSplashSpeed);
+		BloodSplashIMG->SetColorAndOpacity(NewColor);
+	}
+	if (BloodSplashIMG->GetColorAndOpacity() == EndColor) bUpdateBloodSplash = false;
 }
 
 void UPlayerHUDWidget::StartTimer()

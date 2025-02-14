@@ -15,6 +15,8 @@ class ZSHOOT_API UPlayerHUDWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 	// Core Functions
 	void ShowHitMarker();
 	void SetHealthValue(float Value);
@@ -28,6 +30,8 @@ public:
 	int GetTimer() const;
 	void IncreaseKillCount(int Kill);
 	void SetWave(int WaveNumber);
+	void UpdateBloodSplash(float DeltaTime);
+	void SetBloodSplashVisibility(bool bVisible) { bUpdateBloodSplash = bVisible; }
 
 protected:
 	virtual void NativeConstruct() override;
@@ -43,6 +47,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "HUD", meta = (BindWidget))
 	TObjectPtr<UImage> HitMarker;
+
+	UPROPERTY(BlueprintReadOnly, Category = "HUD", meta = (BindWidget))
+	TObjectPtr<UImage> BloodSplashIMG;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Ammo", meta = (BindWidget))
 	TObjectPtr<UTextBlock> AmmoText1;
@@ -78,6 +85,10 @@ private:
 	int KillCount = 0;
 	int GameTimer = 0;
 	int Wave = 0;
+	bool bUpdateBloodSplash = false;
+
+	UPROPERTY(EditAnywhere, Category = "HUD", meta = (AllowPrivateAccess = "true"))
+	float BloodSplashSpeed = 1.0f;
 
 	// Helper Functions
 	void FadeHitMarker();
