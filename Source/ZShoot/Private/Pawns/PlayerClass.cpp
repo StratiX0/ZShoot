@@ -155,7 +155,6 @@ void APlayerClass::Fire(const FInputActionValue& Value)
 	}
 }
 
-
 void APlayerClass::StartShootCooldown()
 {
 	float Interval = 60.f / FireRate;
@@ -193,7 +192,17 @@ void APlayerClass::PlayFireEffects()
 
 	if (BulletTracerVFX)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BulletTracerVFX, ShootingPoint->GetComponentLocation(), ShootingPoint->GetComponentRotation());
+		FHitResult OutHit = FireRaycast();
+        
+		FVector Start = ShootingPoint->GetComponentLocation();
+		FVector End = OutHit.ImpactPoint;
+
+		FVector Direction = End - Start;
+		Direction.Normalize();
+
+		FRotator TracerRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
+
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BulletTracerVFX, Start, TracerRotation);
 	}
 
 	SpawnPins();
