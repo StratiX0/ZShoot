@@ -24,6 +24,7 @@ public:
 	void HideReloadBar();
 	void StartWaveTimer(float Time);
 	void StartTimer();
+	void StopTimer();
 	int GetTimer() const;
 	void IncreaseKillCount(int Kill);
 
