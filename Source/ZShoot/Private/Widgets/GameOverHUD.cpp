@@ -8,6 +8,7 @@
 
 void UGameOverHUD::UpdateHUD(int Score, int HighScore, float Timer, bool bNewHighScore)
 {
+	UGameplayStatics::SetGamePaused(this, true);
 	// Use the new local variable name
 	if (ScoreText)
 	{
@@ -40,6 +41,7 @@ void UGameOverHUD::RestartLevel()
 		RestartButton->SetIsEnabled(false);
 	}
 	UWorld* World = GetWorld();
+	UGameplayStatics::SetGamePaused(this, false);
 	if (World)
 	{
 		if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))

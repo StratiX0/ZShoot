@@ -152,7 +152,6 @@ void APlayerClass::Fire(const FInputActionValue& Value)
 
 		if (OutHit.GetActor())
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit: %s"), *OutHit.GetActor()->GetName()));
 			ApplyDamageToActor(OutHit);
 		}
 
